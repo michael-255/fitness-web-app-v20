@@ -25,10 +25,10 @@ export class Workout extends Parent {
     desc,
     enabled,
     favorited,
-    previous,
+    previousChild,
     exerciseIds,
   }: WorkoutParams) {
-    super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previous })
+    super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previousChild })
     this.exerciseIds = exerciseIds
   }
 

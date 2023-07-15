@@ -32,9 +32,9 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
 
 function getHint() {
   if (route.name === RouteName.EDIT) {
-    return previous.value?.number ? `Currently ${previous.value.number}` : 'No previous record'
+    return previous.value?.number ? `Currently ${previous.value.number}` : 'No previous value'
   } else {
-    return previous.value?.number ? `${previous.value.number}` : 'No previous record'
+    return previous.value?.number ? `Previously ${previous.value.number}` : 'No previous value'
   }
 }
 </script>

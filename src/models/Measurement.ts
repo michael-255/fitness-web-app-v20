@@ -30,10 +30,10 @@ export class Measurement extends Parent {
     desc,
     enabled,
     favorited,
-    previous,
+    previousChild,
     measurementInput,
   }: MeasurementParams) {
-    super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previous })
+    super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previousChild })
     this.measurementInput = measurementInput
   }
 

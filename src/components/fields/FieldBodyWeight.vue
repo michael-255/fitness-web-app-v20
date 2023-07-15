@@ -34,9 +34,11 @@ function getHint() {
   if (route.name === RouteName.EDIT) {
     return previous.value?.bodyWeight
       ? `Currently ${previous.value.bodyWeight} lbs`
-      : 'No previous record'
+      : 'No previous value'
   } else {
-    return previous.value?.bodyWeight ? `${previous.value.bodyWeight} lbs` : 'No previous record'
+    return previous.value?.bodyWeight
+      ? `Previously ${previous.value.bodyWeight} lbs`
+      : 'No previous value'
   }
 }
 </script>

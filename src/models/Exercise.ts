@@ -39,11 +39,11 @@ export class Exercise extends Parent {
     desc,
     enabled,
     favorited,
-    previous,
+    previousChild,
     exerciseInputs,
     multipleSets,
   }: ExerciseParams) {
-    super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previous })
+    super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previousChild })
     this.exerciseInputs = exerciseInputs
     this.multipleSets = multipleSets
   }
@@ -56,7 +56,9 @@ export class Exercise extends Parent {
     return [
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldExerciseInputs.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldMultipleSets.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),
     ]

@@ -32,9 +32,9 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
 
 function getHint() {
   if (route.name === RouteName.EDIT) {
-    return previous.value?.inches ? `Currently ${previous.value.inches} in` : 'No previous record'
+    return previous.value?.inches ? `Currently ${previous.value.inches} in` : 'No previous value'
   } else {
-    return previous.value?.inches ? `${previous.value.inches} in` : 'No previous record'
+    return previous.value?.inches ? `Previously ${previous.value.inches} in` : 'No previous value'
   }
 }
 </script>

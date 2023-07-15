@@ -32,9 +32,9 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
 
 function getHint() {
   if (route.name === RouteName.EDIT) {
-    return previous.value?.percent ? `Currently ${previous.value.percent}%` : 'No previous record'
+    return previous.value?.percent ? `Currently ${previous.value.percent}%` : 'No previous value'
   } else {
-    return previous.value?.percent ? `${previous.value.percent}%` : 'No previous record'
+    return previous.value?.percent ? `Previously ${previous.value.percent}%` : 'No previous value'
   }
 }
 </script>

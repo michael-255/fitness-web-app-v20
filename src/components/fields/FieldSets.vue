@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Ref, ref } from 'vue'
 import { Icon, Limit, RouteName } from '@/types/general'
-import type { AnyDBRecord } from '@/types/database'
+import type { AnyDBRecord, DBField } from '@/types/database'
 import { ExerciseInput } from '@/models/Exercise'
 import { numberSchema } from '@/models/MeasurementResult'
 import useActionStore from '@/stores/action'
@@ -20,10 +20,12 @@ const parentExerciseInputs: Ref<ExerciseInput[]> = ref([])
 const parentMultipleSets: Ref<boolean> = ref(false)
 const setTracker = ref([null])
 const isVisible: Ref<boolean> = ref(false)
+const previous: Ref<AnyDBRecord> = ref({})
 
 useParentIdWatcher((parentRecord: AnyDBRecord) => {
   parentExerciseInputs.value = parentRecord?.exerciseInputs
   parentMultipleSets.value = parentRecord?.multipleSets
+  previous.value = parentRecord.previousChild
 
   if (route.name === RouteName.CREATE) {
     Object.values(ExerciseInput).forEach((input) => {
@@ -88,22 +90,17 @@ function removeSet() {
   )
 }
 
-// function previousValue(setIndex: number, field: Field) {
-//   if (route.name === RouteName.EDIT) {
-//     return ''
-//   } else {
-//     const previousExerciseSet = corePrevious.value?.exerciseSets?.[setIndex] as {
-//       [key in Field]: any
-//     }
-
-//     if (previousExerciseSet) {
-//       const previousValue = previousExerciseSet[field]
-//       return previousValue ? String(previousValue) : ''
-//     } else {
-//       return ''
-//     }
-//   }
-// }
+function getHint(field: DBField, index: number) {
+  if (route.name === RouteName.EDIT) {
+    return previous.value?.[field]?.[index]
+      ? `Currently ${previous.value[field][index]}`
+      : 'No previous value'
+  } else {
+    return previous.value?.[field]?.[index]
+      ? `Previous ${previous.value[field][index]}`
+      : 'No previous value'
+  }
+}
 </script>
 
 <template>
@@ -144,10 +141,10 @@ function removeSet() {
             filled
             square
             dense
-            hint="TODO"
             v-model.number="actionStore.record[DB.getFieldForInput(input)][setIndex]"
             :rules="[(val: number) => numberSchema.safeParse(val).success || 'Required']"
             :label="input"
+            :hint="getHint(DB.getFieldForInput(input), setIndex)"
           />
         </div>
       </div>
