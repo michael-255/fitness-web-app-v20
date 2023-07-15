@@ -59,10 +59,7 @@ export enum DBField {
   DESC = 'desc',
   ENABLED = 'enabled',
   FAVORITED = 'favorited',
-  PREVIOUS = 'previous',
-
-  // Previous
-  WORKOUT_DURATION = 'workoutDuration',
+  PREVIOUS_CHILD = 'previousChild',
 
   // Child
   PARENT_ID = 'parentId',

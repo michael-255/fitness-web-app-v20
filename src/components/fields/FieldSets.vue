@@ -25,8 +25,6 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
   parentExerciseInputs.value = parentRecord?.exerciseInputs
   parentMultipleSets.value = parentRecord?.multipleSets
 
-  console.log('action record', actionStore.record)
-
   if (route.name === RouteName.CREATE) {
     Object.values(ExerciseInput).forEach((input) => {
       if (parentExerciseInputs.value.includes(input)) {

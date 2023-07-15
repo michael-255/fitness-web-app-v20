@@ -3,31 +3,46 @@ import { type Ref, ref } from 'vue'
 import type { AnyDBRecord } from '@/types/database'
 import { MeasurementInput } from '@/models/Measurement'
 import { numberSchema } from '@/models/MeasurementResult'
+import { RouteName } from '@/types/general'
 import useActionStore from '@/stores/action'
 import useParentIdWatcher from '@/composables/useParentIdWatcher'
+import useRouting from '@/composables/useRouting'
 
+const { route } = useRouting()
 const actionStore = useActionStore()
 
-const isVisible: Ref<boolean> = ref(false)
+const isVisible = ref(false)
+const previous: Ref<AnyDBRecord> = ref({})
 
 useParentIdWatcher((parentRecord: AnyDBRecord) => {
+  previous.value = parentRecord.previousChild
+
   if (parentRecord?.measurementInput === MeasurementInput.NUMBER) {
-    delete actionStore.record.bodyWeight
-    delete actionStore.record.percent
-    delete actionStore.record.inches
-    actionStore.record.number = undefined
+    if (route.name === RouteName.CREATE) {
+      delete actionStore.record.bodyWeight
+      delete actionStore.record.percent
+      delete actionStore.record.inches
+      actionStore.record.number = undefined
+    }
     isVisible.value = true
   } else {
     isVisible.value = false
   }
 })
+
+function getHint() {
+  if (route.name === RouteName.EDIT) {
+    return previous.value?.number ? `Currently ${previous.value.number}` : 'No previous record'
+  } else {
+    return previous.value?.number ? `${previous.value.number}` : 'No previous record'
+  }
+}
 </script>
 
 <template>
   <div v-if="isVisible">
     <div class="text-weight-bold text-body1">{{ MeasurementInput.NUMBER }}</div>
 
-    <!-- TODO - Hint with last value -->
     <QInput
       v-model.number="actionStore.record.number"
       :rules="[(val: number) => numberSchema.safeParse(val).success || 'Must be a valid number']"
@@ -36,6 +51,7 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
       dense
       outlined
       color="primary"
+      :hint="getHint()"
     />
   </div>
 </template>

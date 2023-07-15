@@ -2,32 +2,47 @@
 import { MeasurementInput } from '@/models/Measurement'
 import { percentSchema } from '@/models/MeasurementResult'
 import type { AnyDBRecord } from '@/types/database'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
+import { RouteName } from '@/types/general'
 import useParentIdWatcher from '@/composables/useParentIdWatcher'
 import useActionStore from '@/stores/action'
+import useRouting from '@/composables/useRouting'
 
+const { route } = useRouting()
 const actionStore = useActionStore()
 
 const isVisible = ref(false)
+const previous: Ref<AnyDBRecord> = ref({})
 
 useParentIdWatcher((parentRecord: AnyDBRecord) => {
+  previous.value = parentRecord.previousChild
+
   if (parentRecord?.measurementInput === MeasurementInput.PERCENT) {
-    delete actionStore.record.bodyWeight
-    actionStore.record.percent = undefined
-    delete actionStore.record.inches
-    delete actionStore.record.number
+    if (route.name === RouteName.CREATE) {
+      delete actionStore.record.bodyWeight
+      actionStore.record.percent = undefined
+      delete actionStore.record.inches
+      delete actionStore.record.number
+    }
     isVisible.value = true
   } else {
     isVisible.value = false
   }
 })
+
+function getHint() {
+  if (route.name === RouteName.EDIT) {
+    return previous.value?.percent ? `Currently ${previous.value.percent}%` : 'No previous record'
+  } else {
+    return previous.value?.percent ? `${previous.value.percent}%` : 'No previous record'
+  }
+}
 </script>
 
 <template>
   <div v-if="isVisible">
     <div class="text-weight-bold text-body1">{{ MeasurementInput.PERCENT }}</div>
 
-    <!-- TODO - Hint with last value -->
     <QInput
       v-model.number="actionStore.record.percent"
       :rules="[(val: number) => percentSchema.safeParse(val).success || 'Must be between 1 and 100']"
@@ -36,6 +51,7 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
       dense
       outlined
       color="primary"
+      :hint="getHint()"
     />
   </div>
 </template>

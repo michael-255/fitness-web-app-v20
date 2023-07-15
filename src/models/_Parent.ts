@@ -1,4 +1,4 @@
-import { DBField, type InspectionItem } from '@/types/database'
+import { DBField, type AnyDBRecord, type InspectionItem } from '@/types/database'
 import { z } from 'zod'
 import { Entity, booleanSchema, entitySchema } from '@/models/_Entity'
 import { Limit } from '@/types/general'
@@ -7,15 +7,14 @@ import { getDisplayDate, truncateString } from '@/utils/common'
 
 export const nameSchema = z.string().min(Limit.MIN_NAME).max(Limit.MAX_NAME).trim()
 export const textAreaSchema = z.string().max(Limit.MAX_TEXT_AREA).trim()
-export const previousSchema = z.record(z.nativeEnum(DBField), z.any()).optional()
-export type Previous = z.infer<typeof previousSchema>
+export const previousChildSchema = z.record(z.nativeEnum(DBField), z.any()).optional()
 
 export const parentSchema = entitySchema.extend({
   [DBField.NAME]: nameSchema,
   [DBField.DESC]: textAreaSchema,
   [DBField.ENABLED]: booleanSchema,
   [DBField.FAVORITED]: booleanSchema,
-  [DBField.PREVIOUS]: previousSchema,
+  [DBField.PREVIOUS_CHILD]: previousChildSchema,
 })
 
 const parentOptionalSchema = parentSchema.deepPartial()
@@ -26,7 +25,7 @@ export class Parent extends Entity {
   [DBField.DESC]?: string;
   [DBField.ENABLED]?: boolean;
   [DBField.FAVORITED]?: boolean;
-  [DBField.PREVIOUS]?: Previous
+  [DBField.PREVIOUS_CHILD]?: AnyDBRecord
 
   constructor({
     id,
@@ -36,14 +35,14 @@ export class Parent extends Entity {
     desc,
     enabled,
     favorited,
-    previous,
+    previousChild,
   }: ParentParams) {
     super({ id, createdTimestamp, activated })
     this.name = name
     this.desc = desc
     this.enabled = enabled
     this.favorited = favorited
-    this.previous = previous
+    this.previousChild = previousChild
   }
 
   static getInspectionItems(): InspectionItem[] {
@@ -74,11 +73,11 @@ export class Parent extends Entity {
         format: (val: boolean) => (val ? 'Yes' : 'No'),
       },
       {
-        field: DBField.PREVIOUS,
+        field: DBField.PREVIOUS_CHILD,
         label: 'Last Record Date',
         output: 'single',
-        format: (val: Previous) =>
-          val?.createdTimestamp ? getDisplayDate(val?.createdTimestamp) : 'No previous records',
+        format: (val: AnyDBRecord) =>
+          val?.createdTimestamp ? getDisplayDate(val.createdTimestamp) : 'No previous records',
       },
     ]
   }
@@ -123,14 +122,14 @@ export class Parent extends Entity {
         format: (val: boolean) => (val ? 'Yes' : 'No'),
       },
       {
-        name: DBField.PREVIOUS,
+        name: DBField.PREVIOUS_CHILD,
         label: 'Last Record Date',
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.PREVIOUS],
-        format: (val: Previous) =>
-          val?.createdTimestamp ? getDisplayDate(val?.createdTimestamp) : 'No previous records',
+        field: (row: any) => row[DBField.PREVIOUS_CHILD],
+        format: (val: AnyDBRecord) =>
+          val?.createdTimestamp ? getDisplayDate(val.createdTimestamp) : 'No previous records',
       },
     ]
   }

@@ -15,7 +15,6 @@ import {
 import { Setting, SettingKey, settingSchema, type SettingValue } from '@/models/Setting'
 import { Log, LogLevel, logSchema, type LogDetails } from '@/models/Log'
 import type { z } from 'zod'
-import type { Previous } from '@/models/_Parent'
 import { truncateString } from '@/utils/common'
 import { Workout, workoutSchema } from '@/models/Workout'
 import { WorkoutResult, workoutResultSchema } from '@/models/WorkoutResult'
@@ -164,7 +163,7 @@ class Database extends Dexie {
         desc: '',
         enabled: true,
         favorited: false,
-        previous: undefined,
+        previousChild: undefined,
         exerciseIds: [],
       }),
       [DBTable.EXERCISES]: new Exercise({
@@ -175,7 +174,7 @@ class Database extends Dexie {
         desc: '',
         enabled: true,
         favorited: false,
-        previous: undefined,
+        previousChild: undefined,
         exerciseInputs: [],
         multipleSets: true,
       }),
@@ -187,7 +186,7 @@ class Database extends Dexie {
         desc: '',
         enabled: true,
         favorited: false,
-        previous: undefined,
+        previousChild: undefined,
         measurementInput: undefined,
       }),
       [DBTable.WORKOUT_RESULTS]: new WorkoutResult({
@@ -448,7 +447,7 @@ class Database extends Dexie {
 
   private cleanParents<T extends AnyDBRecord>(records: T[]) {
     return records.map((r) => {
-      delete r.previous
+      delete r.previousChild
       delete r.activated
       return r
     })
@@ -639,14 +638,7 @@ class Database extends Dexie {
         .sortBy(DBField.CREATED_TIMESTAMP)
     ).reverse()[0] as AnyDBRecord | undefined
 
-    const previous: Previous = {}
-
-    if (previousChild) {
-      previous.createdTimestamp = previousChild.createdTimestamp
-      previous.note = previousChild.note
-    }
-
-    return await this.table(parentTable).update(id, { previous })
+    return await this.table(parentTable).update(id, { previousChild })
   }
 
   async updateAllPrevious(parentTable: ParentTable) {

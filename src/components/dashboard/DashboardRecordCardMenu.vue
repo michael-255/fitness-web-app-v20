@@ -71,12 +71,12 @@ function onDeactivate(table: DBTable, id: string) {
 <template>
   <div class="absolute-top-right q-ma-xs">
     <QIcon
-      v-show="record.previous?.note"
+      v-show="record.previousChild?.note"
       :name="Icon.NOTE"
       color="primary"
       size="md"
       class="cursor-pointer q-mr-xs"
-      @click="viewPreviousNote(record?.previous?.note || '')"
+      @click="viewPreviousNote(record?.previousChild?.note || '')"
     />
 
     <QBtn

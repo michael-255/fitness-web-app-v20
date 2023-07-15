@@ -47,15 +47,16 @@ async function onActivate(table: DBTable, id: string) {
             <QIcon :name="Icon.PREVIOUS" />
             <span class="text-caption q-ml-xs">
               {{
-                useTimeAgo(record.previous?.createdTimestamp || '').value || 'No previous records'
+                useTimeAgo(record.previousChild?.createdTimestamp || '').value ||
+                'No previous records'
               }}
             </span>
           </QBadge>
 
-          <div v-if="record.previous?.createdTimestamp">
+          <div v-if="record.previousChild?.createdTimestamp">
             <QIcon :name="Icon.CALENDAR_CHECK" />
             <span class="text-caption q-ml-xs">
-              {{ getDisplayDate(record.previous?.createdTimestamp) }}
+              {{ getDisplayDate(record.previousChild.createdTimestamp) }}
             </span>
           </div>
         </QCardSection>
