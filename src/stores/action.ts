@@ -1,4 +1,3 @@
-import type { MeasurementInput } from '@/models/Measurement'
 import type { AnyDBRecord, DBTable } from '@/types/database'
 import { defineStore } from 'pinia'
 
@@ -7,7 +6,6 @@ const useActionStore = defineStore({
 
   state: () => ({
     table: '' as DBTable,
-    measurementInput: '' as MeasurementInput,
     record: {} as AnyDBRecord,
   }),
 })

@@ -12,6 +12,10 @@ const isVisible = ref(false)
 
 useParentIdWatcher((parentRecord: AnyDBRecord) => {
   if (parentRecord?.measurementInput === MeasurementInput.PERCENT) {
+    delete actionStore.record.bodyWeight
+    actionStore.record.percent = undefined
+    delete actionStore.record.inches
+    delete actionStore.record.number
     isVisible.value = true
   } else {
     isVisible.value = false

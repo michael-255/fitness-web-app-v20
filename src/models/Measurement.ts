@@ -8,7 +8,6 @@ export enum MeasurementInput {
   BODY_WEIGHT = 'Body Weight (lbs)',
   PERCENT = 'Percentage',
   INCHES = 'Inches',
-  LBS = 'Lbs',
   NUMBER = 'Number',
 }
 export const measurementInputSchema = z.nativeEnum(MeasurementInput)

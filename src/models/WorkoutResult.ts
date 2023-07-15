@@ -5,7 +5,6 @@ import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
 import { createdTimestampSchema, idSchema } from '@/models/_Entity'
 import { getDisplayDate } from '@/utils/common'
-import { Parent } from '@/models/_Parent'
 
 export const finishedTimestampSchema = createdTimestampSchema.optional()
 export const exerciseResultIdsSchema = z.array(idSchema) // Could be empty
@@ -50,7 +49,7 @@ export class WorkoutResult extends Child {
 
   static getInspectionItems(): InspectionItem[] {
     return [
-      ...Parent.getInspectionItems(),
+      ...Child.getInspectionItems(),
       {
         field: DBField.EXERCISE_RESULT_IDS,
         label: 'Exercise Results',

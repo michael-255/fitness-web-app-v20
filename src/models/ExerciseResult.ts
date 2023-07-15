@@ -4,7 +4,6 @@ import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
 import { ExerciseInput } from '@/models/Exercise'
-import { Parent } from '@/models/_Parent'
 
 export const exerciseDataFields = [
   DBField.REPS,
@@ -18,7 +17,9 @@ export const exerciseDataFields = [
   DBField.CALORIES,
 ]
 
-export const setsSchema = z.number().min(Number.MIN_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER)
+export const setsSchema = z.array(
+  z.number().min(Number.MIN_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER)
+)
 
 // Hack to make a partial of this before using refine()
 const _exerciseResultSchema = childSchema.extend({
@@ -50,15 +51,15 @@ const partialExerciseResultSchema = _exerciseResultSchema.deepPartial()
 type ExerciseResultParams = z.infer<typeof partialExerciseResultSchema>
 
 export class ExerciseResult extends Child {
-  [DBField.REPS]?: number;
-  [DBField.WEIGHT]?: number;
-  [DBField.DISTANCE]?: number;
-  [DBField.DURATION]?: number;
-  [DBField.WATTS]?: number;
-  [DBField.SPEED]?: number;
-  [DBField.RESISTANCE]?: number;
-  [DBField.INCLINE]?: number;
-  [DBField.CALORIES]?: number
+  [DBField.REPS]?: number[];
+  [DBField.WEIGHT]?: number[];
+  [DBField.DISTANCE]?: number[];
+  [DBField.DURATION]?: number[];
+  [DBField.WATTS]?: number[];
+  [DBField.SPEED]?: number[];
+  [DBField.RESISTANCE]?: number[];
+  [DBField.INCLINE]?: number[];
+  [DBField.CALORIES]?: number[]
 
   constructor({
     id,
@@ -95,6 +96,7 @@ export class ExerciseResult extends Child {
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldSets.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
     ]
@@ -102,11 +104,11 @@ export class ExerciseResult extends Child {
 
   static getInspectionItems(): InspectionItem[] {
     return [
-      ...Parent.getInspectionItems(),
+      ...Child.getInspectionItems(),
       {
         field: DBField.REPS,
         label: ExerciseInput.REPS,
-        output: 'list',
+        output: 'single',
         format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {

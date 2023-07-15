@@ -7,7 +7,7 @@ import useActionStore from '@/stores/action'
 import DB from '@/services/Database'
 import useRouting from '@/composables/useRouting'
 
-const { route, routeTable } = useRouting()
+const { route, routeTable, routeParentId } = useRouting()
 const { log } = useLogger()
 const actionStore = useActionStore()
 
@@ -19,6 +19,11 @@ onMounted(async () => {
       const parentTable = DB.getParentTable(routeTable)
 
       options.value = await DB.getParentIdOptions(parentTable)
+
+      // Auto select parent id from route when attaching record
+      if (routeParentId) {
+        actionStore.record.parentId = routeParentId
+      }
 
       const parentIdMatch = options.value.some((i) => i.value === actionStore.record.parentId)
 

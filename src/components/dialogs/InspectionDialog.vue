@@ -27,15 +27,6 @@ const title =
 
 onMounted(async () => {
   extend(true, actionStore.record, props.record) // Copy record values to action store
-
-  // Load measurement input into action store
-  if (props.table === DBTable.MEASUREMENT_RESULTS) {
-    const measurement = await DB.getRecord(DBTable.MEASUREMENTS, props.record.parentId)
-
-    if (measurement) {
-      actionStore.measurementInput = measurement.measurementInput
-    }
-  }
 })
 
 onUnmounted(() => {
@@ -62,9 +53,9 @@ onUnmounted(() => {
         <p class="text-h5">{{ title }}</p>
 
         <div v-for="(item, i) in inspectionItems" :key="i" class="q-mb-md">
-          <div class="text-weight-bold text-body1">{{ item.label }}</div>
-
           <div v-if="actionStore.record[item.field] !== undefined">
+            <div class="text-weight-bold text-body1">{{ item.label }}</div>
+
             <div v-if="item.output === 'single'">
               {{ item.format(actionStore.record[item.field]) }}
             </div>

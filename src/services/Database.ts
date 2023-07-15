@@ -19,7 +19,7 @@ import type { Previous } from '@/models/_Parent'
 import { truncateString } from '@/utils/common'
 import { Workout, workoutSchema } from '@/models/Workout'
 import { WorkoutResult, workoutResultSchema } from '@/models/WorkoutResult'
-import { Exercise, exerciseSchema } from '@/models/Exercise'
+import { Exercise, ExerciseInput, exerciseSchema } from '@/models/Exercise'
 import { ExerciseResult, exerciseResultSchema } from '@/models/ExerciseResult'
 import { Measurement, measurementSchema } from '@/models/Measurement'
 import { MeasurementResult, measurementResultSchema } from '@/models/MeasurementResult'
@@ -140,6 +140,20 @@ class Database extends Dexie {
     }[table]
   }
 
+  getFieldForInput(exerciseInput: ExerciseInput) {
+    return {
+      [ExerciseInput.REPS]: DBField.REPS,
+      [ExerciseInput.WEIGHT]: DBField.WEIGHT,
+      [ExerciseInput.DISTANCE]: DBField.DISTANCE,
+      [ExerciseInput.DURATION]: DBField.DURATION,
+      [ExerciseInput.WATTS]: DBField.WATTS,
+      [ExerciseInput.SPEED]: DBField.SPEED,
+      [ExerciseInput.RESISTANCE]: DBField.RESISTANCE,
+      [ExerciseInput.INCLINE]: DBField.INCLINE,
+      [ExerciseInput.CALORIES]: DBField.CALORIES,
+    }[exerciseInput]
+  }
+
   getDefaultActionRecord(table: DBTable) {
     return {
       [DBTable.WORKOUTS]: new Workout({
@@ -191,6 +205,15 @@ class Database extends Dexie {
         activated: false,
         parentId: undefined,
         note: '',
+        reps: undefined,
+        weightLbs: undefined,
+        distanceMiles: undefined,
+        durationMinutes: undefined,
+        watts: undefined,
+        speedMph: undefined,
+        resistance: undefined,
+        incline: undefined,
+        calories: undefined,
       }),
       [DBTable.MEASUREMENT_RESULTS]: new MeasurementResult({
         id: uid(),
@@ -198,6 +221,10 @@ class Database extends Dexie {
         activated: false,
         parentId: undefined,
         note: '',
+        bodyWeight: undefined,
+        percent: undefined,
+        inches: undefined,
+        number: undefined,
       }),
     }[table]
   }

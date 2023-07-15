@@ -4,7 +4,6 @@ import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
 import { MeasurementInput } from '@/models/Measurement'
-import { Parent } from '@/models/_Parent'
 
 export const measurementDataFields = [
   DBField.BODY_WEIGHT,
@@ -84,7 +83,7 @@ export class MeasurementResult extends Child {
 
   static getInspectionItems(): InspectionItem[] {
     return [
-      ...Parent.getInspectionItems(),
+      ...Child.getInspectionItems(),
       {
         field: DBField.BODY_WEIGHT,
         label: MeasurementInput.BODY_WEIGHT,

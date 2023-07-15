@@ -17,6 +17,7 @@ export enum Limit {
   MAX_TEXT_AREA = 250,
   MAX_NAME = 50,
   MIN_NAME = 1,
+  MAX_SETS = 20,
 }
 
 export enum Duration {
@@ -78,8 +79,10 @@ export enum Icon {
   ATTACH = 'post_add',
   CANCEL = 'cancel',
   ADD = 'add',
+  REMOVE = 'remove',
   SAVE = 'save',
   DEFAULTS = 'playlist_add',
+  REMOVE_SET = 'backspace',
 
   // Design Elements
   MENU = 'menu',
