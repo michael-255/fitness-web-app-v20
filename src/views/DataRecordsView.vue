@@ -98,7 +98,7 @@ async function onCharts(parentTable: ParentTable, id: string) {
         </QTd>
         <QTd auto-width>
           <QBtn
-            v-if="[DBTable.EXAMPLES, DBTable.TESTS].includes(routeTable as DBTable)"
+            v-if="[DBTable.WORKOUTS, DBTable.EXERCISES, DBTable.MEASUREMENTS].includes(routeTable as DBTable)"
             flat
             round
             dense

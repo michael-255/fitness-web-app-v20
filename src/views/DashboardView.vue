@@ -4,47 +4,59 @@ import { useMeta } from 'quasar'
 import { ref, type Ref, onUnmounted, onMounted } from 'vue'
 import { AppName } from '@/constants/global'
 import { SettingKey } from '@/models/Setting'
-import { Example } from '@/models/Example'
-import { Test } from '@/models/Test'
 import { DBTable } from '@/types/database'
+import { Workout } from '@/models/Workout'
+import { Exercise } from '@/models/Exercise'
+import { Measurement } from '@/models/Measurement'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import WelcomeOverlay from '@/components/WelcomeOverlay.vue'
 import useUIStore from '@/stores/ui'
 import useLogger from '@/composables/useLogger'
 import DashboardRecordCardList from '@/components/dashboard/DashboardRecordCardList.vue'
-import useDefaults from '@/composables/useDefaults'
+// import useDefaults from '@/composables/useDefaults'
 import DB from '@/services/Database'
 
 useMeta({ title: `${AppName} - Dashboard` })
 
 const uiStore = useUIStore()
 const { log } = useLogger()
-const { onDefaultExamples, onDefaultTests } = useDefaults()
+// const { } = useDefaults()
 
 const dashboardOptions = [
   {
-    value: DBTable.EXAMPLES,
-    label: Example.getLabel('plural'),
-    icon: Icon.EXAMPLES,
+    value: DBTable.WORKOUTS,
+    label: Workout.getLabel('plural'),
+    icon: Icon.WORKOUTS,
   },
   {
-    value: DBTable.TESTS,
-    label: Test.getLabel('plural'),
-    icon: Icon.TESTS,
+    value: DBTable.EXERCISES,
+    label: Exercise.getLabel('plural'),
+    icon: Icon.EXERCISES,
+  },
+  {
+    value: DBTable.MEASUREMENTS,
+    label: Measurement.getLabel('plural'),
+    icon: Icon.MEASUREMENTS,
   },
 ]
 const showDescriptions = ref(false)
-const dashboardExamples: Ref<Example[]> = ref([])
-const dashboardTests: Ref<Test[]> = ref([])
+const workouts: Ref<Workout[]> = ref([])
+const exercises: Ref<Exercise[]> = ref([])
+const measurements: Ref<Measurement[]> = ref([])
 
-const examplesSubscription = DB.liveDashboardData<Example>(DBTable.EXAMPLES).subscribe({
-  next: (liveExamples) => (dashboardExamples.value = liveExamples),
-  error: (error) => log.error('Error fetching live Examples', error),
+const workoutsSubscription = DB.liveDashboardData<Workout>(DBTable.WORKOUTS).subscribe({
+  next: (liveData) => (workouts.value = liveData),
+  error: (error) => log.error('Error fetching live Workouts', error),
 })
 
-const testsSubscription = DB.liveDashboardData<Test>(DBTable.TESTS).subscribe({
-  next: (liveTests) => (dashboardTests.value = liveTests),
-  error: (error) => log.error('Error fetching live Tests', error),
+const exercisesSubscription = DB.liveDashboardData<Exercise>(DBTable.EXERCISES).subscribe({
+  next: (liveData) => (exercises.value = liveData),
+  error: (error) => log.error('Error fetching live Exercises', error),
+})
+
+const measurementsSubscription = DB.liveDashboardData<Measurement>(DBTable.MEASUREMENTS).subscribe({
+  next: (liveData) => (measurements.value = liveData),
+  error: (error) => log.error('Error fetching live Measurements', error),
 })
 
 onMounted(async () => {
@@ -52,8 +64,9 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  examplesSubscription.unsubscribe()
-  testsSubscription.unsubscribe()
+  workoutsSubscription.unsubscribe()
+  exercisesSubscription.unsubscribe()
+  measurementsSubscription.unsubscribe()
 })
 </script>
 
@@ -82,18 +95,25 @@ onUnmounted(() => {
 
     <section>
       <DashboardRecordCardList
-        v-show="uiStore.dashboardSelection === DBTable.EXAMPLES"
-        :parentTable="DBTable.EXAMPLES"
-        :records="dashboardExamples"
+        v-show="uiStore.dashboardSelection === DBTable.WORKOUTS"
+        :parentTable="DBTable.WORKOUTS"
+        :records="workouts"
         :showDescriptions="showDescriptions"
-        :defaultsFunc="onDefaultExamples"
+        :defaultsFunc="undefined"
       />
       <DashboardRecordCardList
-        v-show="uiStore.dashboardSelection === DBTable.TESTS"
-        :parentTable="DBTable.TESTS"
-        :records="dashboardTests"
+        v-show="uiStore.dashboardSelection === DBTable.EXERCISES"
+        :parentTable="DBTable.EXERCISES"
+        :records="exercises"
         :showDescriptions="showDescriptions"
-        :defaultsFunc="onDefaultTests"
+        :defaultsFunc="undefined"
+      />
+      <DashboardRecordCardList
+        v-show="uiStore.dashboardSelection === DBTable.MEASUREMENTS"
+        :parentTable="DBTable.MEASUREMENTS"
+        :records="measurements"
+        :showDescriptions="showDescriptions"
+        :defaultsFunc="undefined"
       />
     </section>
   </ResponsivePage>

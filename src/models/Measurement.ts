@@ -1,21 +1,27 @@
 import { DBField } from '@/types/database'
-import { z } from 'zod'
-import { idSchema } from '@/models/_Entity'
-import { Parent, parentSchema } from '@/models/_Parent'
 import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
+import { z } from 'zod'
+import { Parent, parentSchema } from '@/models/_Parent'
 
-export const idsSchema = z.array(idSchema)
+export enum MeasurementInput {
+  BODY_WEIGHT = 'Body Weight (lbs)',
+  PERCENT = 'Percentage',
+  INCHES = 'Inches',
+  LBS = 'Lbs',
+  NUMBER = 'Number',
+}
+export const measurementInputSchema = z.nativeEnum(MeasurementInput)
 
-export const exampleSchema = parentSchema.extend({
-  [DBField.TEST_IDS]: idsSchema,
+export const measurementSchema = parentSchema.extend({
+  [DBField.MEASUREMENT_INPUT]: measurementInputSchema,
 })
 
-const exampleOptionalSchema = exampleSchema.deepPartial()
-type ExampleParams = z.infer<typeof exampleOptionalSchema>
+const partialMeasurementSchema = measurementSchema.deepPartial()
+type MeasurementParams = z.infer<typeof partialMeasurementSchema>
 
-export class Example extends Parent {
-  [DBField.TEST_IDS]?: string[]
+export class Measurement extends Parent {
+  [DBField.MEASUREMENT_INPUT]?: MeasurementInput
 
   constructor({
     id,
@@ -26,21 +32,20 @@ export class Example extends Parent {
     enabled,
     favorited,
     previous,
-    testIds,
-  }: ExampleParams) {
+    measurementInput,
+  }: MeasurementParams) {
     super({ id, createdTimestamp, activated, name, desc, enabled, favorited, previous })
-    this.testIds = testIds
+    this.measurementInput = measurementInput
   }
 
   static getLabel(style: 'singular' | 'plural') {
-    return style === 'singular' ? 'Example' : 'Examples'
+    return style === 'singular' ? 'Measurement' : 'Measurements'
   }
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldTestIds.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),
@@ -50,21 +55,10 @@ export class Example extends Parent {
   }
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
-    return [defineAsyncComponent(() => import('@/components/charts/ChartPercent.vue'))]
+    return []
   }
 
   static getTableColumns(): QTableColumn[] {
-    return [
-      ...Parent.getTableColumns(),
-      {
-        name: DBField.TEST_IDS,
-        label: 'Test Ids',
-        align: 'left',
-        sortable: true,
-        required: false,
-        field: (row: any) => row[DBField.TEST_IDS],
-        format: (val: string[]) => `${val?.length ? val.length : 0}`,
-      },
-    ]
+    return [...Parent.getTableColumns()]
   }
 }

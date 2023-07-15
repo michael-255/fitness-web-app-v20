@@ -60,8 +60,9 @@ export enum Icon {
   // Tables Types
   PARENTS = 'table_chart',
   CHILDREN = 'fact_check',
-  EXAMPLES = 'smart_toy',
-  TESTS = 'cruelty_free',
+  WORKOUTS = 'assignment',
+  EXERCISES = 'fitness_center',
+  MEASUREMENTS = 'straighten',
 
   // Actions
   BACK = 'arrow_back',

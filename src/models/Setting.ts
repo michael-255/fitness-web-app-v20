@@ -2,6 +2,7 @@ import { InternalField } from '@/types/database'
 import { z } from 'zod'
 
 export enum SettingKey {
+  USER_HEIGHT_INCHES = 'user-height-inches',
   WELCOME_OVERLAY = 'welcome-overlay',
   DASHBOARD_DESCRIPTIONS = 'dashboard-descriptions',
   DARK_MODE = 'dark-mode',

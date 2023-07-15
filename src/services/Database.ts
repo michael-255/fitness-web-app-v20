@@ -14,22 +14,26 @@ import {
 } from '@/types/database'
 import { Setting, SettingKey, settingSchema, type SettingValue } from '@/models/Setting'
 import { Log, LogLevel, logSchema, type LogDetails } from '@/models/Log'
-import { Example, exampleSchema } from '@/models/Example'
-import { ExampleResult, exampleResultSchema } from '@/models/ExampleResults'
-import { Test, testSchema } from '@/models/Test'
-import { TestResult, testResultSchema } from '@/models/TestResults'
 import type { z } from 'zod'
 import type { Previous } from '@/models/_Parent'
 import { truncateString } from '@/utils/common'
+import { Workout, workoutSchema } from '@/models/Workout'
+import { WorkoutResult, workoutResultSchema } from '@/models/WorkoutResult'
+import { Exercise, exerciseSchema } from '@/models/Exercise'
+import { ExerciseResult, exerciseResultSchema } from '@/models/ExerciseResult'
+import { Measurement, measurementSchema } from '@/models/Measurement'
+import { MeasurementResult, measurementResultSchema } from '@/models/MeasurementResult'
 
 class Database extends Dexie {
   // Required for easier TypeScript usage
   [InternalTable.SETTINGS]!: Table<Setting>;
   [InternalTable.LOGS]!: Table<Log>;
-  [DBTable.EXAMPLES]!: Table<Example>;
-  [DBTable.EXAMPLE_RESULTS]!: Table<ExampleResult>;
-  [DBTable.TESTS]!: Table<Test>;
-  [DBTable.TEST_RESULTS]!: Table<TestResult>
+  [DBTable.WORKOUTS]!: Table<Workout>;
+  [DBTable.EXERCISES]!: Table<Exercise>;
+  [DBTable.MEASUREMENTS]!: Table<Measurement>;
+  [DBTable.WORKOUT_RESULTS]!: Table<WorkoutResult>;
+  [DBTable.EXERCISE_RESULTS]!: Table<ExerciseResult>;
+  [DBTable.MEASUREMENT_RESULTS]!: Table<MeasurementResult>
 
   constructor(name: string) {
     super(name)
@@ -37,19 +41,23 @@ class Database extends Dexie {
     this.version(1).stores({
       [InternalTable.SETTINGS]: `&${InternalField.KEY}`,
       [InternalTable.LOGS]: `++${InternalField.AUTO_ID}`,
-      [DBTable.EXAMPLES]: `&${DBField.ID}, ${DBField.NAME}`,
-      [DBTable.EXAMPLE_RESULTS]: `&${DBField.ID}, ${DBField.PARENT_ID}, ${DBField.CREATED_TIMESTAMP}`,
-      [DBTable.TESTS]: `&${DBField.ID}, ${DBField.NAME}`,
-      [DBTable.TEST_RESULTS]: `&${DBField.ID}, ${DBField.PARENT_ID}, ${DBField.CREATED_TIMESTAMP}`,
+      [DBTable.WORKOUTS]: `&${DBField.ID}, ${DBField.NAME}`,
+      [DBTable.EXERCISES]: `&${DBField.ID}, ${DBField.NAME}`,
+      [DBTable.MEASUREMENTS]: `&${DBField.ID}, ${DBField.NAME}`,
+      [DBTable.WORKOUT_RESULTS]: `&${DBField.ID}, ${DBField.PARENT_ID}, ${DBField.CREATED_TIMESTAMP}`,
+      [DBTable.EXERCISE_RESULTS]: `&${DBField.ID}, ${DBField.PARENT_ID}, ${DBField.CREATED_TIMESTAMP}`,
+      [DBTable.MEASUREMENT_RESULTS]: `&${DBField.ID}, ${DBField.PARENT_ID}, ${DBField.CREATED_TIMESTAMP}`,
     })
 
     // Required
     this[InternalTable.SETTINGS].mapToClass(Setting)
     this[InternalTable.LOGS].mapToClass(Log)
-    this[DBTable.EXAMPLES].mapToClass(Example)
-    this[DBTable.EXAMPLE_RESULTS].mapToClass(ExampleResult)
-    this[DBTable.TESTS].mapToClass(Test)
-    this[DBTable.TEST_RESULTS].mapToClass(TestResult)
+    this[DBTable.WORKOUTS].mapToClass(Workout)
+    this[DBTable.EXERCISES].mapToClass(Exercise)
+    this[DBTable.MEASUREMENTS].mapToClass(Measurement)
+    this[DBTable.WORKOUT_RESULTS].mapToClass(WorkoutResult)
+    this[DBTable.EXERCISE_RESULTS].mapToClass(ExerciseResult)
+    this[DBTable.MEASUREMENT_RESULTS].mapToClass(MeasurementResult)
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -60,59 +68,70 @@ class Database extends Dexie {
 
   getParentTable(table: DBTable): ParentTable {
     return {
-      [DBTable.EXAMPLES]: DBTable.EXAMPLES as ParentTable,
-      [DBTable.EXAMPLE_RESULTS]: DBTable.EXAMPLES as ParentTable,
-      [DBTable.TESTS]: DBTable.TESTS as ParentTable,
-      [DBTable.TEST_RESULTS]: DBTable.TESTS as ParentTable,
+      [DBTable.WORKOUTS]: DBTable.WORKOUTS as ParentTable,
+      [DBTable.EXERCISES]: DBTable.EXERCISES as ParentTable,
+      [DBTable.MEASUREMENTS]: DBTable.MEASUREMENTS as ParentTable,
+      [DBTable.WORKOUT_RESULTS]: DBTable.WORKOUTS as ParentTable,
+      [DBTable.EXERCISE_RESULTS]: DBTable.EXERCISES as ParentTable,
+      [DBTable.MEASUREMENT_RESULTS]: DBTable.MEASUREMENTS as ParentTable,
     }[table]
   }
 
   getChildTable(table: DBTable): ChildTable {
     return {
-      [DBTable.EXAMPLES]: DBTable.EXAMPLE_RESULTS as ChildTable,
-      [DBTable.EXAMPLE_RESULTS]: DBTable.EXAMPLE_RESULTS as ChildTable,
-      [DBTable.TESTS]: DBTable.TEST_RESULTS as ChildTable,
-      [DBTable.TEST_RESULTS]: DBTable.TEST_RESULTS as ChildTable,
+      [DBTable.WORKOUTS]: DBTable.WORKOUT_RESULTS as ChildTable,
+      [DBTable.EXERCISES]: DBTable.EXERCISE_RESULTS as ChildTable,
+      [DBTable.MEASUREMENTS]: DBTable.MEASUREMENT_RESULTS as ChildTable,
+      [DBTable.WORKOUT_RESULTS]: DBTable.WORKOUT_RESULTS as ChildTable,
+      [DBTable.EXERCISE_RESULTS]: DBTable.EXERCISE_RESULTS as ChildTable,
+      [DBTable.MEASUREMENT_RESULTS]: DBTable.MEASUREMENT_RESULTS as ChildTable,
     }[table]
   }
 
   getLabel(table: DBTable, style: 'singular' | 'plural') {
     return {
-      [DBTable.EXAMPLES]: Example.getLabel(style),
-      [DBTable.EXAMPLE_RESULTS]: ExampleResult.getLabel(style),
-      [DBTable.TESTS]: Test.getLabel(style),
-      [DBTable.TEST_RESULTS]: TestResult.getLabel(style),
+      [DBTable.WORKOUTS]: Workout.getLabel(style),
+      [DBTable.EXERCISES]: Exercise.getLabel(style),
+      [DBTable.MEASUREMENTS]: Measurement.getLabel(style),
+      [DBTable.WORKOUT_RESULTS]: WorkoutResult.getLabel(style),
+      [DBTable.EXERCISE_RESULTS]: ExerciseResult.getLabel(style),
+      [DBTable.MEASUREMENT_RESULTS]: MeasurementResult.getLabel(style),
     }[table]
   }
 
   getFieldComponents(table: DBTable) {
     return {
-      [DBTable.EXAMPLES]: Example.getFieldComponents(),
-      [DBTable.EXAMPLE_RESULTS]: ExampleResult.getFieldComponents(),
-      [DBTable.TESTS]: Test.getFieldComponents(),
-      [DBTable.TEST_RESULTS]: TestResult.getFieldComponents(),
+      [DBTable.WORKOUTS]: Workout.getFieldComponents(),
+      [DBTable.EXERCISES]: Exercise.getFieldComponents(),
+      [DBTable.MEASUREMENTS]: Measurement.getFieldComponents(),
+      [DBTable.WORKOUT_RESULTS]: WorkoutResult.getFieldComponents(),
+      [DBTable.EXERCISE_RESULTS]: ExerciseResult.getFieldComponents(),
+      [DBTable.MEASUREMENT_RESULTS]: MeasurementResult.getFieldComponents(),
     }[table]
   }
 
   getChartComponents(parentTable: ParentTable) {
     return {
-      [DBTable.EXAMPLES]: Example.getChartComponents(),
-      [DBTable.TESTS]: Test.getChartComponents(),
+      [DBTable.WORKOUTS]: Workout.getChartComponents(),
+      [DBTable.EXERCISES]: Exercise.getChartComponents(),
+      [DBTable.MEASUREMENTS]: Measurement.getChartComponents(),
     }[parentTable]
   }
 
   getTableColumns(table: DBTable) {
     return {
-      [DBTable.EXAMPLES]: Example.getTableColumns(),
-      [DBTable.EXAMPLE_RESULTS]: ExampleResult.getTableColumns(),
-      [DBTable.TESTS]: Test.getTableColumns(),
-      [DBTable.TEST_RESULTS]: TestResult.getTableColumns(),
+      [DBTable.WORKOUTS]: Workout.getTableColumns(),
+      [DBTable.EXERCISES]: Exercise.getTableColumns(),
+      [DBTable.MEASUREMENTS]: Measurement.getTableColumns(),
+      [DBTable.WORKOUT_RESULTS]: WorkoutResult.getTableColumns(),
+      [DBTable.EXERCISE_RESULTS]: ExerciseResult.getTableColumns(),
+      [DBTable.MEASUREMENT_RESULTS]: MeasurementResult.getTableColumns(),
     }[table]
   }
 
   getDefaultActionRecord(table: DBTable) {
     return {
-      [DBTable.EXAMPLES]: new Example({
+      [DBTable.WORKOUTS]: new Workout({
         id: uid(),
         createdTimestamp: Date.now(),
         activated: false,
@@ -121,17 +140,9 @@ class Database extends Dexie {
         enabled: true,
         favorited: false,
         previous: undefined,
-        testIds: [],
+        exerciseIds: [],
       }),
-      [DBTable.EXAMPLE_RESULTS]: new ExampleResult({
-        id: uid(),
-        createdTimestamp: Date.now(),
-        activated: false,
-        parentId: undefined,
-        note: '',
-        percent: undefined,
-      }),
-      [DBTable.TESTS]: new Test({
+      [DBTable.EXERCISES]: new Exercise({
         id: uid(),
         createdTimestamp: Date.now(),
         activated: false,
@@ -140,13 +151,44 @@ class Database extends Dexie {
         enabled: true,
         favorited: false,
         previous: undefined,
+        exerciseInputs: [],
+        multipleSets: true,
       }),
-      [DBTable.TEST_RESULTS]: new TestResult({
+      [DBTable.MEASUREMENTS]: new Measurement({
+        id: uid(),
+        createdTimestamp: Date.now(),
+        activated: false,
+        name: '',
+        desc: '',
+        enabled: true,
+        favorited: false,
+        previous: undefined,
+        measurementInput: undefined,
+      }),
+      [DBTable.WORKOUT_RESULTS]: new WorkoutResult({
         id: uid(),
         createdTimestamp: Date.now(),
         activated: false,
         parentId: undefined,
         note: '',
+        finishedTimestamp: undefined,
+        exerciseResultIds: [],
+      }),
+      [DBTable.EXERCISE_RESULTS]: new ExerciseResult({
+        id: uid(),
+        createdTimestamp: Date.now(),
+        activated: false,
+        parentId: undefined,
+        note: '',
+        exerciseSets: [],
+      }),
+      [DBTable.MEASUREMENT_RESULTS]: new MeasurementResult({
+        id: uid(),
+        createdTimestamp: Date.now(),
+        activated: false,
+        parentId: undefined,
+        note: '',
+        measurementData: undefined,
       }),
     }[table]
   }
@@ -173,6 +215,7 @@ class Database extends Dexie {
     const defaultSettings: Readonly<{
       [key in SettingKey]: SettingValue
     }> = {
+      [SettingKey.USER_HEIGHT_INCHES]: undefined,
       [SettingKey.WELCOME_OVERLAY]: true,
       [SettingKey.DASHBOARD_DESCRIPTIONS]: true,
       [SettingKey.DARK_MODE]: true,
@@ -311,12 +354,16 @@ class Database extends Dexie {
   liveDataTable(table: DBTable) {
     return liveQuery(async () => {
       return {
-        [DBTable.EXAMPLES]: async () => this._getParentDataTable<Example>(DBTable.EXAMPLES),
-        [DBTable.EXAMPLE_RESULTS]: async () =>
-          this._getChildDataTable<ExampleResult>(DBTable.EXAMPLE_RESULTS),
-        [DBTable.TESTS]: async () => this._getParentDataTable<Test>(DBTable.TESTS),
-        [DBTable.TEST_RESULTS]: async () =>
-          this._getChildDataTable<TestResult>(DBTable.TEST_RESULTS),
+        [DBTable.WORKOUTS]: async () => this._getParentDataTable<Workout>(DBTable.WORKOUTS),
+        [DBTable.WORKOUT_RESULTS]: async () =>
+          this._getChildDataTable<WorkoutResult>(DBTable.WORKOUT_RESULTS),
+        [DBTable.EXERCISES]: async () => this._getParentDataTable<Exercise>(DBTable.EXERCISES),
+        [DBTable.EXERCISE_RESULTS]: async () =>
+          this._getChildDataTable<ExerciseResult>(DBTable.EXERCISE_RESULTS),
+        [DBTable.MEASUREMENTS]: async () =>
+          this._getParentDataTable<Measurement>(DBTable.MEASUREMENTS),
+        [DBTable.MEASUREMENT_RESULTS]: async () =>
+          this._getChildDataTable<MeasurementResult>(DBTable.MEASUREMENT_RESULTS),
       }[table]()
     })
   }
@@ -359,10 +406,28 @@ class Database extends Dexie {
 
   async getLastChild(parentTable: ParentTable, id: string) {
     return await {
-      [DBTable.EXAMPLES]: async () =>
-        this._getLastParentChild<ExampleResult>(DBTable.EXAMPLE_RESULTS, id),
-      [DBTable.TESTS]: async () => this._getLastParentChild<TestResult>(DBTable.TEST_RESULTS, id),
+      [DBTable.WORKOUTS]: async () =>
+        this._getLastParentChild<WorkoutResult>(DBTable.WORKOUT_RESULTS, id),
+      [DBTable.EXERCISES]: async () =>
+        this._getLastParentChild<ExerciseResult>(DBTable.EXERCISE_RESULTS, id),
+      [DBTable.MEASUREMENTS]: async () =>
+        this._getLastParentChild<MeasurementResult>(DBTable.MEASUREMENT_RESULTS, id),
     }[parentTable]()
+  }
+
+  private cleanParents<T extends AnyDBRecord>(records: T[]) {
+    return records.map((r) => {
+      delete r.previous
+      delete r.activated
+      return r
+    })
+  }
+
+  private cleanChildren<T extends AnyDBRecord>(records: T[]) {
+    return records.map((r) => {
+      delete r.activated
+      return r
+    })
   }
 
   async getBackupData() {
@@ -372,24 +437,14 @@ class Database extends Dexie {
       createdTimestamp: Date.now(),
       Settings: await this.Settings.toArray(),
       Logs: await this.Logs.toArray(),
-      Examples: (await this.Examples.toArray()).map((record) => {
-        delete record.previous
-        delete record.activated
-        return record
-      }),
-      ExampleResults: (await this.ExampleResults.toArray()).map((record) => {
-        delete record.activated
-        return record
-      }),
-      Tests: (await this.Tests.toArray()).map((record) => {
-        delete record.previous
-        delete record.activated
-        return record
-      }),
-      TestResults: (await this.TestResults.toArray()).map((record) => {
-        delete record.activated
-        return record
-      }),
+      Workouts: this.cleanParents<Workout>(await this.Workouts.toArray()),
+      Exercises: this.cleanParents<Exercise>(await this.Exercises.toArray()),
+      Measurements: this.cleanParents<Measurement>(await this.Measurements.toArray()),
+      WorkoutResults: this.cleanChildren<WorkoutResult>(await this.WorkoutResults.toArray()),
+      ExerciseResults: this.cleanChildren<ExerciseResult>(await this.ExerciseResults.toArray()),
+      MeasurementResults: this.cleanChildren<MeasurementResult>(
+        await this.MeasurementResults.toArray()
+      ),
     }
 
     return backupData
@@ -401,16 +456,6 @@ class Database extends Dexie {
     const records = await this.table(parentTable).orderBy(DBField.NAME).toArray()
 
     return records.map((r: AnyDBRecord) => ({
-      value: r.id,
-      label: `${r.name} (${truncateString(r.id, 8, '*')})`,
-      disable: r.activated,
-    }))
-  }
-
-  async getTestIdsOptions(): Promise<{ value: string; label: string; disable: boolean }[]> {
-    const tests = await this.Tests.orderBy(DBField.NAME).toArray()
-
-    return tests.map((r: AnyDBRecord) => ({
       value: r.id,
       label: `${r.name} (${truncateString(r.id, 8, '*')})`,
       disable: r.activated,
@@ -444,12 +489,16 @@ class Database extends Dexie {
 
   async addRecord(table: DBTable, record: AnyDBRecord) {
     return await {
-      [DBTable.EXAMPLES]: async () => this._addParent(DBTable.EXAMPLES, record, exampleSchema),
-      [DBTable.EXAMPLE_RESULTS]: async () =>
-        this._addChild(DBTable.EXAMPLE_RESULTS, record, exampleResultSchema),
-      [DBTable.TESTS]: async () => this._addParent(DBTable.TESTS, record, testSchema),
-      [DBTable.TEST_RESULTS]: async () =>
-        this._addChild(DBTable.TEST_RESULTS, record, testResultSchema),
+      [DBTable.WORKOUTS]: async () => this._addParent(DBTable.WORKOUTS, record, workoutSchema),
+      [DBTable.EXERCISES]: async () => this._addParent(DBTable.EXERCISES, record, exerciseSchema),
+      [DBTable.MEASUREMENTS]: async () =>
+        this._addParent(DBTable.MEASUREMENTS, record, measurementSchema),
+      [DBTable.WORKOUT_RESULTS]: async () =>
+        this._addChild(DBTable.WORKOUT_RESULTS, record, workoutResultSchema),
+      [DBTable.EXERCISE_RESULTS]: async () =>
+        this._addChild(DBTable.EXERCISE_RESULTS, record, exerciseResultSchema),
+      [DBTable.MEASUREMENT_RESULTS]: async () =>
+        this._addChild(DBTable.MEASUREMENT_RESULTS, record, measurementResultSchema),
     }[table]()
   }
 
@@ -478,12 +527,17 @@ class Database extends Dexie {
 
   async importRecords(table: DBTable, records: AnyDBRecord[]) {
     const skippedRecords = await {
-      [DBTable.EXAMPLES]: async () => this.processImport(DBTable.EXAMPLES, records, exampleSchema),
-      [DBTable.EXAMPLE_RESULTS]: async () =>
-        this.processImport(DBTable.EXAMPLE_RESULTS, records, exampleResultSchema),
-      [DBTable.TESTS]: async () => this.processImport(DBTable.TESTS, records, testSchema),
-      [DBTable.TEST_RESULTS]: async () =>
-        this.processImport(DBTable.TEST_RESULTS, records, testResultSchema),
+      [DBTable.WORKOUTS]: async () => this.processImport(DBTable.WORKOUTS, records, workoutSchema),
+      [DBTable.EXERCISES]: async () =>
+        this.processImport(DBTable.EXERCISES, records, exerciseSchema),
+      [DBTable.MEASUREMENTS]: async () =>
+        this.processImport(DBTable.MEASUREMENTS, records, measurementSchema),
+      [DBTable.WORKOUT_RESULTS]: async () =>
+        this.processImport(DBTable.WORKOUT_RESULTS, records, workoutResultSchema),
+      [DBTable.EXERCISE_RESULTS]: async () =>
+        this.processImport(DBTable.EXERCISE_RESULTS, records, exerciseResultSchema),
+      [DBTable.MEASUREMENT_RESULTS]: async () =>
+        this.processImport(DBTable.MEASUREMENT_RESULTS, records, measurementResultSchema),
     }[table]()
 
     if (skippedRecords.length > 0) {
@@ -523,13 +577,16 @@ class Database extends Dexie {
 
   async putRecord(table: DBTable, record: AnyDBRecord) {
     return await {
-      [DBTable.EXAMPLES]: async () =>
-        await this._putParent(DBTable.EXAMPLES, record, exampleSchema),
-      [DBTable.EXAMPLE_RESULTS]: async () =>
-        await this._putChild(DBTable.EXAMPLE_RESULTS, record, exampleResultSchema),
-      [DBTable.TESTS]: async () => await this._putParent(DBTable.TESTS, record, testSchema),
-      [DBTable.TEST_RESULTS]: async () =>
-        await this._putChild(DBTable.TEST_RESULTS, record, testResultSchema),
+      [DBTable.WORKOUTS]: async () => this._putParent(DBTable.WORKOUTS, record, workoutSchema),
+      [DBTable.EXERCISES]: async () => this._putParent(DBTable.EXERCISES, record, exerciseSchema),
+      [DBTable.MEASUREMENTS]: async () =>
+        this._putParent(DBTable.MEASUREMENTS, record, measurementSchema),
+      [DBTable.WORKOUT_RESULTS]: async () =>
+        this._putChild(DBTable.WORKOUT_RESULTS, record, workoutResultSchema),
+      [DBTable.EXERCISE_RESULTS]: async () =>
+        this._putChild(DBTable.EXERCISE_RESULTS, record, exerciseResultSchema),
+      [DBTable.MEASUREMENT_RESULTS]: async () =>
+        this._putChild(DBTable.MEASUREMENT_RESULTS, record, measurementResultSchema),
     }[table]()
   }
 
@@ -602,12 +659,15 @@ class Database extends Dexie {
     }
 
     return await {
-      [DBTable.EXAMPLES]: async () => this._deleteParent(DBTable.EXAMPLES, id),
-      [DBTable.EXAMPLE_RESULTS]: async () =>
-        this._deleteChild(DBTable.EXAMPLE_RESULTS, id, recordToDelete),
-      [DBTable.TESTS]: async () => this._deleteParent(DBTable.TESTS, id),
-      [DBTable.TEST_RESULTS]: async () =>
-        this._deleteChild(DBTable.TEST_RESULTS, id, recordToDelete),
+      [DBTable.WORKOUTS]: async () => this._deleteParent(DBTable.WORKOUTS, id),
+      [DBTable.EXERCISES]: async () => this._deleteParent(DBTable.EXERCISES, id),
+      [DBTable.MEASUREMENTS]: async () => this._deleteParent(DBTable.MEASUREMENTS, id),
+      [DBTable.WORKOUT_RESULTS]: async () =>
+        this._deleteChild(DBTable.WORKOUT_RESULTS, id, recordToDelete),
+      [DBTable.EXERCISE_RESULTS]: async () =>
+        this._deleteChild(DBTable.EXERCISE_RESULTS, id, recordToDelete),
+      [DBTable.MEASUREMENT_RESULTS]: async () =>
+        this._deleteChild(DBTable.MEASUREMENT_RESULTS, id, recordToDelete),
     }[table]()
   }
 

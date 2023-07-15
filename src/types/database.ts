@@ -1,9 +1,11 @@
-import type { Example } from '@/models/Example'
-import type { ExampleResult } from '@/models/ExampleResults'
+import type { Exercise } from '@/models/Exercise'
+import type { ExerciseResult } from '@/models/ExerciseResult'
 import type { Log } from '@/models/Log'
+import type { Measurement } from '@/models/Measurement'
+import type { MeasurementResult } from '@/models/MeasurementResult'
 import type { Setting } from '@/models/Setting'
-import type { Test } from '@/models/Test'
-import type { TestResult } from '@/models/TestResults'
+import type { Workout } from '@/models/Workout'
+import type { WorkoutResult } from '@/models/WorkoutResult'
 import { z } from 'zod'
 
 export enum InternalTable {
@@ -30,14 +32,19 @@ export enum InternalField {
  * First table must be a Parent table for UI store dashboard selection default
  */
 export enum DBTable {
-  EXAMPLES = 'Examples',
-  EXAMPLE_RESULTS = 'ExampleResults',
-  TESTS = 'Tests',
-  TEST_RESULTS = 'TestResults',
+  WORKOUTS = 'Workouts',
+  EXERCISES = 'Exercises',
+  MEASUREMENTS = 'Measurements',
+  WORKOUT_RESULTS = 'WorkoutResults',
+  EXERCISE_RESULTS = 'ExerciseResults',
+  MEASUREMENT_RESULTS = 'MeasurementResults',
 }
 
-export type ParentTable = DBTable.EXAMPLES | DBTable.TESTS
-export type ChildTable = DBTable.EXAMPLE_RESULTS | DBTable.TEST_RESULTS
+export type ParentTable = DBTable.WORKOUTS | DBTable.EXERCISES | DBTable.MEASUREMENTS
+export type ChildTable =
+  | DBTable.WORKOUT_RESULTS
+  | DBTable.EXERCISE_RESULTS
+  | DBTable.MEASUREMENT_RESULTS
 
 export const tableSchema = z.nativeEnum(DBTable)
 
@@ -54,21 +61,46 @@ export enum DBField {
   FAVORITED = 'favorited',
   PREVIOUS = 'previous',
 
+  // Previous
+  WORKOUT_DURATION = 'workoutDuration',
+
   // Child
   PARENT_ID = 'parentId',
   NOTE = 'note',
 
-  // Example Parent
-  TEST_IDS = 'testIds',
+  // Workout
+  EXERCISE_IDS = 'exerciseIds',
 
-  // Example Child Data
+  // Exercise
+  EXERCISE_INPUTS = 'exerciseInputs',
+  MULTIPLE_SETS = 'multipleSets',
+
+  // Measurement
+  MEASUREMENT_INPUT = 'measurementInput',
+
+  // Workout Result
+  FINISHED_TIMESTAMP = 'finishedTimestamp',
+  EXERCISE_RESULT_IDS = 'exerciseResultIds',
+
+  // Exercise Result
+  EXERCISE_SETS = 'exerciseSets',
+  REPS = 'reps',
+  WEIGHT = 'weightLbs',
+  DISTANCE = 'distanceMiles',
+  DURATION = 'durationMinutes',
+  WATTS = 'watts',
+  SPEED = 'speedMph',
+  RESISTANCE = 'resistance',
+  INCLINE = 'incline',
+  CALORIES = 'calories',
+
+  // Measurement Result
+  MEASUREMENT_DATA = 'measurementData',
+  BODY_WEIGHT = 'bodyWeight',
   PERCENT = 'percent',
-
-  // Test Parent
-  // ...
-
-  // Test Child Data
-  // ...
+  INCHES = 'inches',
+  LBS = 'lbs',
+  NUMBER = 'number',
 }
 
 export type AnyDBRecord = { [key in DBField | InternalField]?: any }
@@ -79,8 +111,10 @@ export type BackupData = {
   [DBField.CREATED_TIMESTAMP]: number
   [InternalTable.SETTINGS]: Setting[]
   [InternalTable.LOGS]: Log[]
-  [DBTable.EXAMPLES]: Example[]
-  [DBTable.EXAMPLE_RESULTS]: ExampleResult[]
-  [DBTable.TESTS]: Test[]
-  [DBTable.TEST_RESULTS]: TestResult[]
+  [DBTable.WORKOUTS]: Workout[]
+  [DBTable.EXERCISES]: Exercise[]
+  [DBTable.MEASUREMENTS]: Measurement[]
+  [DBTable.WORKOUT_RESULTS]: WorkoutResult[]
+  [DBTable.EXERCISE_RESULTS]: ExerciseResult[]
+  [DBTable.MEASUREMENT_RESULTS]: MeasurementResult[]
 }

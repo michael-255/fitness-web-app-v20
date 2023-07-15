@@ -13,8 +13,8 @@ export const entitySchema = z.object({
   [DBField.ACTIVATED]: booleanSchema.default(false),
 })
 
-const entityOptionalSchema = entitySchema.deepPartial()
-type EntityParams = z.infer<typeof entityOptionalSchema>
+const partialEntitySchema = entitySchema.deepPartial()
+type EntityParams = z.infer<typeof partialEntitySchema>
 
 export class Entity {
   [DBField.ID]?: string;
