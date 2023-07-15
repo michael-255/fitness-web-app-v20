@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { Parent, parentSchema } from '@/models/_Parent'
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import { defineAsyncComponent } from 'vue'
 import type { QTableColumn } from 'quasar'
 import { truncateString } from '@/utils/common'
@@ -54,18 +54,34 @@ export class Exercise extends Parent {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
     ]
   }
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return []
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Parent.getInspectionItems(),
+      {
+        field: DBField.EXERCISE_INPUTS,
+        label: 'Exercise Inputs',
+        output: 'list',
+        format: (val: ExerciseInput[]) => val || [],
+      },
+      {
+        field: DBField.MULTIPLE_SETS,
+        label: 'Multiple Sets',
+        output: 'single',
+        format: (val: boolean) => (val ? 'Yes' : 'No'),
+      },
+    ]
   }
 
   static getTableColumns(): QTableColumn[] {

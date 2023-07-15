@@ -1,10 +1,11 @@
 import { Child, childSchema } from '@/models/_Child'
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
 import { createdTimestampSchema, idSchema } from '@/models/_Entity'
 import { getDisplayDate } from '@/utils/common'
+import { Parent } from '@/models/_Parent'
 
 export const finishedTimestampSchema = createdTimestampSchema.optional()
 export const exerciseResultIdsSchema = z.array(idSchema) // Could be empty
@@ -41,11 +42,27 @@ export class WorkoutResult extends Child {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
+    ]
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Parent.getInspectionItems(),
+      {
+        field: DBField.EXERCISE_RESULT_IDS,
+        label: 'Exercise Results',
+        output: 'list',
+        format: (val: string[]) => val || [],
+      },
+      {
+        field: DBField.FINISHED_TIMESTAMP,
+        label: 'Finished Date',
+        output: 'single',
+        format: (val: number | undefined) => (val ? getDisplayDate(val) : '-'),
+      },
     ]
   }
 

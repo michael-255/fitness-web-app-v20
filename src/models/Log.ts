@@ -1,4 +1,4 @@
-import { InternalField } from '@/types/database'
+import { InternalField, type InspectionItem } from '@/types/database'
 import { createdTimestampSchema } from '@/models/_Entity'
 import type { QTableColumn } from 'quasar'
 import { getDisplayDate, truncateString } from '@/utils/common'
@@ -57,15 +57,50 @@ export class Log {
     return style === 'singular' ? 'Log' : 'Logs'
   }
 
-  static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
+  static getInspectionItems(): InspectionItem[] {
     return [
-      defineAsyncComponent(() => import('@/components/fields/FieldAutoId.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldLogLevel.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldLogLabel.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldDetails.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldErrorMessage.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldStackTrace.vue')),
+      {
+        field: InternalField.AUTO_ID,
+        label: 'Auto Id',
+        output: 'single',
+        format: (val: any) => `${val || '-'}`,
+      },
+      {
+        field: InternalField.TIMESTAMP,
+        label: 'Created Date',
+        output: 'single',
+        format: (val: number) => getDisplayDate(val) || '-',
+      },
+      {
+        field: InternalField.LOG_LEVEL,
+        label: 'Log Level',
+        output: 'single',
+        format: (val: LogLevel) => `${val || '-'}`,
+      },
+      {
+        field: InternalField.LABEL,
+        label: 'Label',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+      {
+        field: InternalField.DETAILS,
+        label: 'Details',
+        output: 'key-values',
+        format: (val: LogDetails) => val || {},
+      },
+      {
+        field: InternalField.ERROR_MESSAGE,
+        label: 'Error Message',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+      {
+        field: InternalField.STACK_TRACE,
+        label: 'Stack Trace',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
     ]
   }
 

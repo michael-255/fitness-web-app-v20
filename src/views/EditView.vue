@@ -72,7 +72,7 @@ async function onSubmit() {
         @validation-success="isFormValid = true"
       >
         <div v-for="(field, i) in fieldComponents" :key="i" class="q-mb-md">
-          <component :is="field" :inspecting="false" />
+          <component :is="field" />
         </div>
 
         <div v-if="!actionStore.record.activated" class="row justify-center q-my-sm">

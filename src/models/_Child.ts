@@ -1,4 +1,4 @@
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import { Entity, entitySchema, idSchema } from '@/models/_Entity'
 import { textAreaSchema } from '@/models/_Parent'
 import type { QTableColumn } from 'quasar'
@@ -21,6 +21,24 @@ export class Child extends Entity {
     super({ id, createdTimestamp, activated })
     this.parentId = parentId
     this.note = note
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Entity.getInspectionItems(),
+      {
+        field: DBField.PARENT_ID,
+        label: 'Parent Id',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+      {
+        field: DBField.NOTE,
+        label: 'Note',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+    ]
   }
 
   static getTableColumns(): QTableColumn[] {

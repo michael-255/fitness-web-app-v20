@@ -83,7 +83,6 @@ export enum DBField {
   EXERCISE_RESULT_IDS = 'exerciseResultIds',
 
   // Exercise Result
-  EXERCISE_SETS = 'exerciseSets',
   REPS = 'reps',
   WEIGHT = 'weightLbs',
   DISTANCE = 'distanceMiles',
@@ -95,7 +94,6 @@ export enum DBField {
   CALORIES = 'calories',
 
   // Measurement Result
-  MEASUREMENT_DATA = 'measurementData',
   BODY_WEIGHT = 'bodyWeight',
   PERCENT = 'percent',
   INCHES = 'inches',
@@ -116,4 +114,11 @@ export type BackupData = {
   [DBTable.WORKOUT_RESULTS]: WorkoutResult[]
   [DBTable.EXERCISE_RESULTS]: ExerciseResult[]
   [DBTable.MEASUREMENT_RESULTS]: MeasurementResult[]
+}
+
+export type InspectionItem = {
+  field: keyof AnyDBRecord
+  label: string
+  output: 'single' | 'list' | 'key-values'
+  format: (val: any) => any
 }

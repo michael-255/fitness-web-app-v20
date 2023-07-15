@@ -3,7 +3,7 @@ import { Parent, parentSchema } from '@/models/_Parent'
 import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { idSchema } from '@/models/_Entity'
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 
 export const exerciseIdsSchema = z.array(idSchema).min(1) // Workout must have at least 1 exercise
 
@@ -38,18 +38,28 @@ export class Workout extends Parent {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
     ]
   }
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return []
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Parent.getInspectionItems(),
+      {
+        field: DBField.EXERCISE_IDS,
+        label: 'Exercises',
+        output: 'list',
+        format: (val: string[]) => val || [],
+      },
+    ]
   }
 
   static getTableColumns(): QTableColumn[] {

@@ -1,4 +1,4 @@
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import { getDisplayDate, truncateString } from '@/utils/common'
 import type { QTableColumn } from 'quasar'
 import { z } from 'zod'
@@ -25,6 +25,29 @@ export class Entity {
     this.id = id
     this.createdTimestamp = createdTimestamp
     this.activated = activated
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      {
+        field: DBField.ID,
+        label: 'Id',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+      {
+        field: DBField.CREATED_TIMESTAMP,
+        label: 'Created Date',
+        output: 'single',
+        format: (val: number) => getDisplayDate(val) || '-',
+      },
+      {
+        field: DBField.ACTIVATED,
+        label: 'Activated',
+        output: 'single',
+        format: (val: boolean) => (val ? 'Yes' : 'No'),
+      },
+    ]
   }
 
   static getTableColumns(): QTableColumn[] {

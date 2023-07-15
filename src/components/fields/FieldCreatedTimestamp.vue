@@ -2,12 +2,7 @@
 import { date } from 'quasar'
 import { onMounted, ref } from 'vue'
 import { Icon } from '@/types/general'
-import { getDisplayDate } from '@/utils/common'
 import useActionStore from '@/stores/action'
-
-defineProps<{
-  inspecting: boolean
-}>()
 
 const actionStore = useActionStore()
 
@@ -37,18 +32,12 @@ function onPickerUpdate() {
   const dateTimestamp = new Date(`${datePicker.value} ${timePicker.value}`).getTime()
   updateDisplayDate(dateTimestamp)
 }
-
-function inspectFormat(val: number) {
-  return getDisplayDate(val) || '-'
-}
 </script>
 
 <template>
   <div class="text-weight-bold text-body1">Created Date</div>
 
-  <div v-if="inspecting">{{ inspectFormat(actionStore.record.createdTimestamp) }}</div>
-
-  <QInput v-else v-model="displayDate" dense outlined disable color="primary" hint="Auto formatted">
+  <QInput v-model="displayDate" dense outlined disable color="primary" hint="Auto formatted">
     <template v-slot:after>
       <!-- Date Picker -->
       <QBtn :icon="Icon.CALENDAR_DATE" color="primary" class="q-px-sm">

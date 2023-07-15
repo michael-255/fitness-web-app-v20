@@ -1,9 +1,10 @@
 import { Child, childSchema } from '@/models/_Child'
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
-import { ExerciseInput } from './Exercise'
+import { ExerciseInput } from '@/models/Exercise'
+import { Parent } from '@/models/_Parent'
 
 export const exerciseDataFields = [
   DBField.REPS,
@@ -17,45 +18,47 @@ export const exerciseDataFields = [
   DBField.CALORIES,
 ]
 
-export const setResultsSchema = z.number().min(Number.MIN_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER)
+export const setsSchema = z.number().min(Number.MIN_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER)
 
-export const exerciseSetsSchema = z.array(
-  z
-    .object({
-      [DBField.REPS]: setResultsSchema.optional(),
-      [DBField.WEIGHT]: setResultsSchema.optional(),
-      [DBField.DISTANCE]: setResultsSchema.optional(),
-      [DBField.DURATION]: setResultsSchema.optional(),
-      [DBField.WATTS]: setResultsSchema.optional(),
-      [DBField.SPEED]: setResultsSchema.optional(),
-      [DBField.RESISTANCE]: setResultsSchema.optional(),
-      [DBField.INCLINE]: setResultsSchema.optional(),
-      [DBField.CALORIES]: setResultsSchema.optional(),
-    })
-    .refine(
-      (obj) => {
-        const fieldKeys = Object.keys(obj).filter((f) => exerciseDataFields.includes(f as DBField))
-        const noUndefined = fieldKeys.every((val) => val !== undefined)
-        const noMissingData = fieldKeys.length > 0
-        return noUndefined && noMissingData
-      },
-      {
-        message: 'Must have valid entries in exercise result data fields',
-        path: exerciseDataFields,
-      }
-    )
-)
-export type ExerciseSets = z.infer<typeof exerciseSetsSchema>
-
-export const exerciseResultSchema = childSchema.extend({
-  [DBField.EXERCISE_SETS]: exerciseSetsSchema,
+// Hack to make a partial of this before using refine()
+const _exerciseResultSchema = childSchema.extend({
+  [DBField.REPS]: setsSchema.optional(),
+  [DBField.WEIGHT]: setsSchema.optional(),
+  [DBField.DISTANCE]: setsSchema.optional(),
+  [DBField.DURATION]: setsSchema.optional(),
+  [DBField.WATTS]: setsSchema.optional(),
+  [DBField.SPEED]: setsSchema.optional(),
+  [DBField.RESISTANCE]: setsSchema.optional(),
+  [DBField.INCLINE]: setsSchema.optional(),
+  [DBField.CALORIES]: setsSchema.optional(),
 })
 
-const partialExerciseResultSchema = exerciseResultSchema.deepPartial()
+export const exerciseResultSchema = _exerciseResultSchema.refine(
+  (obj) => {
+    const fieldKeys = Object.keys(obj).filter((f) => exerciseDataFields.includes(f as DBField))
+    const noUndefined = fieldKeys.every((val) => val !== undefined)
+    const noMissingData = fieldKeys.length > 0
+    return noUndefined && noMissingData
+  },
+  {
+    message: 'Must have valid entries in exercise result data fields',
+    path: exerciseDataFields,
+  }
+)
+
+const partialExerciseResultSchema = _exerciseResultSchema.deepPartial()
 type ExerciseResultParams = z.infer<typeof partialExerciseResultSchema>
 
 export class ExerciseResult extends Child {
-  [DBField.EXERCISE_SETS]?: ExerciseSets
+  [DBField.REPS]?: number;
+  [DBField.WEIGHT]?: number;
+  [DBField.DISTANCE]?: number;
+  [DBField.DURATION]?: number;
+  [DBField.WATTS]?: number;
+  [DBField.SPEED]?: number;
+  [DBField.RESISTANCE]?: number;
+  [DBField.INCLINE]?: number;
+  [DBField.CALORIES]?: number
 
   constructor({
     id,
@@ -63,10 +66,26 @@ export class ExerciseResult extends Child {
     activated,
     parentId,
     note,
-    exerciseSets,
+    reps,
+    weightLbs,
+    distanceMiles,
+    durationMinutes,
+    watts,
+    speedMph,
+    resistance,
+    incline,
+    calories,
   }: ExerciseResultParams) {
     super({ id, createdTimestamp, activated, parentId, note })
-    this.exerciseSets = exerciseSets
+    this.reps = reps
+    this.weightLbs = weightLbs
+    this.distanceMiles = distanceMiles
+    this.durationMinutes = durationMinutes
+    this.watts = watts
+    this.speedMph = speedMph
+    this.resistance = resistance
+    this.incline = incline
+    this.calories = calories
   }
 
   static getLabel(style: 'singular' | 'plural') {
@@ -75,11 +94,69 @@ export class ExerciseResult extends Child {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
+    ]
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Parent.getInspectionItems(),
+      {
+        field: DBField.REPS,
+        label: ExerciseInput.REPS,
+        output: 'list',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.WEIGHT,
+        label: ExerciseInput.WEIGHT,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.DISTANCE,
+        label: ExerciseInput.DISTANCE,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.DURATION,
+        label: ExerciseInput.DURATION,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.WATTS,
+        label: ExerciseInput.WATTS,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.SPEED,
+        label: ExerciseInput.SPEED,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.CALORIES,
+        label: ExerciseInput.CALORIES,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.RESISTANCE,
+        label: ExerciseInput.RESISTANCE,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        field: DBField.INCLINE,
+        label: ExerciseInput.INCLINE,
+        output: 'single',
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
     ]
   }
 
@@ -87,139 +164,85 @@ export class ExerciseResult extends Child {
     return [
       ...Child.getTableColumns(),
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.REPS,
         label: ExerciseInput.REPS,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.REPS]) {
-            return val.map((set) => set[DBField.REPS])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.REPS],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.WEIGHT,
         label: ExerciseInput.WEIGHT,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.WEIGHT]) {
-            return val.map((set) => set[DBField.WEIGHT])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.WEIGHT],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.DISTANCE,
         label: ExerciseInput.DISTANCE,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.DISTANCE]) {
-            return val.map((set) => set[DBField.DISTANCE])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.DISTANCE],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.DURATION,
         label: ExerciseInput.DURATION,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.DURATION]) {
-            return val.map((set) => set[DBField.DURATION])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.DURATION],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.WATTS,
         label: ExerciseInput.WATTS,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.WATTS]) {
-            return val.map((set) => set[DBField.WATTS])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.WATTS],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.SPEED,
         label: ExerciseInput.SPEED,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.SPEED]) {
-            return val.map((set) => set[DBField.SPEED])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.SPEED],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
-        label: ExerciseInput.CALORIES,
-        align: 'left',
-        sortable: true,
-        required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.CALORIES]) {
-            return val.map((set) => set[DBField.CALORIES])?.join(', ')
-          } else {
-            return ''
-          }
-        },
-      },
-      {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.RESISTANCE,
         label: ExerciseInput.RESISTANCE,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.RESISTANCE]) {
-            return val.map((set) => set[DBField.RESISTANCE])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.RESISTANCE],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
       {
-        name: DBField.EXERCISE_SETS,
+        name: DBField.INCLINE,
         label: ExerciseInput.INCLINE,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.EXERCISE_SETS],
-        format: (val: Record<DBField, number | undefined>[]) => {
-          if (val?.length > 0 && val[0][DBField.INCLINE]) {
-            return val.map((set) => set[DBField.INCLINE])?.join(', ')
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.INCLINE],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
+      },
+      {
+        name: DBField.CALORIES,
+        label: ExerciseInput.CALORIES,
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.CALORIES],
+        format: (val: number[] | undefined) => (val ? val.join(', ') : ''),
       },
     ]
   }

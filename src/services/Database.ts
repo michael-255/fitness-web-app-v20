@@ -118,6 +118,17 @@ class Database extends Dexie {
     }[parentTable]
   }
 
+  getInspectionItems(table: DBTable) {
+    return {
+      [DBTable.WORKOUTS]: Workout.getInspectionItems(),
+      [DBTable.EXERCISES]: Exercise.getInspectionItems(),
+      [DBTable.MEASUREMENTS]: Measurement.getInspectionItems(),
+      [DBTable.WORKOUT_RESULTS]: WorkoutResult.getInspectionItems(),
+      [DBTable.EXERCISE_RESULTS]: ExerciseResult.getInspectionItems(),
+      [DBTable.MEASUREMENT_RESULTS]: MeasurementResult.getInspectionItems(),
+    }[table]
+  }
+
   getTableColumns(table: DBTable) {
     return {
       [DBTable.WORKOUTS]: Workout.getTableColumns(),
@@ -180,7 +191,6 @@ class Database extends Dexie {
         activated: false,
         parentId: undefined,
         note: '',
-        exerciseSets: [],
       }),
       [DBTable.MEASUREMENT_RESULTS]: new MeasurementResult({
         id: uid(),
@@ -188,7 +198,6 @@ class Database extends Dexie {
         activated: false,
         parentId: undefined,
         note: '',
-        measurementData: undefined,
       }),
     }[table]
   }

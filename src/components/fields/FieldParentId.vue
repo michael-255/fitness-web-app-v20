@@ -7,10 +7,6 @@ import useActionStore from '@/stores/action'
 import DB from '@/services/Database'
 import useRouting from '@/composables/useRouting'
 
-defineProps<{
-  inspecting: boolean
-}>()
-
 const { route, routeTable } = useRouting()
 const { log } = useLogger()
 const actionStore = useActionStore()
@@ -34,38 +30,30 @@ onMounted(async () => {
     log.error('Error with parent id field', error)
   }
 })
-
-function inspectFormat(val: string) {
-  return `${val || '-'}`
-}
 </script>
 
 <template>
   <div class="text-weight-bold text-body1">Parent Record</div>
 
-  <div v-if="inspecting">{{ inspectFormat(actionStore.record.parentId) }}</div>
+  <p>
+    The parent record that this child record is associated with. This cannot be updated once set
+    during record creation.
+  </p>
 
-  <div v-else>
-    <p>
-      The parent record that this child record is associated with. This cannot be updated once set
-      during record creation.
-    </p>
-
-    <QSelect
-      :disable="route.name === RouteName.EDIT"
-      v-model="actionStore.record.parentId"
-      :rules="[(val: string) => idSchema.safeParse(val).success || 'Required']"
-      :options="options"
-      emit-value
-      map-options
-      options-dense
-      dense
-      outlined
-      color="primary"
-    >
-      <template v-if="route.name === RouteName.EDIT" v-slot:prepend>
-        <QIcon color="warning" :name="Icon.LOCK" />
-      </template>
-    </QSelect>
-  </div>
+  <QSelect
+    :disable="route.name === RouteName.EDIT"
+    v-model="actionStore.record.parentId"
+    :rules="[(val: string) => idSchema.safeParse(val).success || 'Required']"
+    :options="options"
+    emit-value
+    map-options
+    options-dense
+    dense
+    outlined
+    color="primary"
+  >
+    <template v-if="route.name === RouteName.EDIT" v-slot:prepend>
+      <QIcon color="warning" :name="Icon.LOCK" />
+    </template>
+  </QSelect>
 </template>

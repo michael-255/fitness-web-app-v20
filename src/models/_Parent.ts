@@ -1,4 +1,4 @@
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import { z } from 'zod'
 import { Entity, booleanSchema, entitySchema } from '@/models/_Entity'
 import { Limit } from '@/types/general'
@@ -44,6 +44,43 @@ export class Parent extends Entity {
     this.enabled = enabled
     this.favorited = favorited
     this.previous = previous
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Entity.getInspectionItems(),
+      {
+        field: DBField.NAME,
+        label: 'Name',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+      {
+        field: DBField.DESC,
+        label: 'Description',
+        output: 'single',
+        format: (val: string) => `${val || '-'}`,
+      },
+      {
+        field: DBField.ENABLED,
+        label: 'Enabled',
+        output: 'single',
+        format: (val: boolean) => (val ? 'Yes' : 'No'),
+      },
+      {
+        field: DBField.FAVORITED,
+        label: 'Favorited',
+        output: 'single',
+        format: (val: boolean) => (val ? 'Yes' : 'No'),
+      },
+      {
+        field: DBField.PREVIOUS,
+        label: 'Last Record Date',
+        output: 'single',
+        format: (val: Previous) =>
+          val?.createdTimestamp ? getDisplayDate(val?.createdTimestamp) : 'No previous records',
+      },
+    ]
   }
 
   static getTableColumns(): QTableColumn[] {

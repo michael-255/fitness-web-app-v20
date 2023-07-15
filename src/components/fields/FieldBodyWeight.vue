@@ -6,10 +6,6 @@ import { bodyWeightSchema } from '@/models/MeasurementResult'
 import useActionStore from '@/stores/action'
 import useParentIdWatcher from '@/composables/useParentIdWatcher'
 
-defineProps<{
-  inspecting: boolean
-}>()
-
 const actionStore = useActionStore()
 
 const isVisible = ref(false)
@@ -21,21 +17,14 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
     isVisible.value = false
   }
 })
-
-function inspectFormat(val: number) {
-  return val ? `${val} lbs` : '-'
-}
 </script>
 
 <template>
   <div v-if="isVisible">
     <div class="text-weight-bold text-body1">{{ MeasurementInput.BODY_WEIGHT }}</div>
 
-    <div v-if="inspecting">{{ inspectFormat(actionStore.record.bodyWeight) }}</div>
-
     <!-- TODO - Hint with last value -->
     <QInput
-      v-else
       v-model.number="actionStore.record.bodyWeight"
       :rules="[(val: number) => bodyWeightSchema.safeParse(val).success || 'Must be between 1 and 1000']"
       type="number"

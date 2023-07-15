@@ -1,9 +1,10 @@
 import { Child, childSchema } from '@/models/_Child'
-import { DBField } from '@/types/database'
+import { DBField, type InspectionItem } from '@/types/database'
 import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
-import { MeasurementInput } from './Measurement'
+import { MeasurementInput } from '@/models/Measurement'
+import { Parent } from '@/models/_Parent'
 
 export const measurementDataFields = [
   DBField.BODY_WEIGHT,
@@ -17,38 +18,35 @@ export const percentSchema = z.number().min(0).max(100)
 export const inchesSchema = z.number().min(1).max(500)
 export const numberSchema = z.number().min(Number.MIN_SAFE_INTEGER).max(Number.MAX_SAFE_INTEGER)
 
-export const measurementDataSchema = z
-  .object({
-    [DBField.BODY_WEIGHT]: bodyWeightSchema.optional(),
-    [DBField.PERCENT]: percentSchema.optional(),
-    [DBField.INCHES]: inchesSchema.optional(),
-    [DBField.NUMBER]: numberSchema.optional(),
-  })
-  .refine(
-    (obj) => {
-      const fieldArray = Object.keys(obj).filter((f) =>
-        measurementDataFields.includes(f as DBField)
-      )
-      const noUndefined = fieldArray.every((val) => val !== undefined)
-      const noWrongCount = fieldArray.length === 1
-      return noUndefined && noWrongCount
-    },
-    {
-      message: 'Must have exactly one valid measurement result data field',
-      path: measurementDataFields,
-    }
-  )
-export type MeasurementData = z.infer<typeof measurementDataSchema>
-
-export const measurementResultSchema = childSchema.extend({
-  [DBField.MEASUREMENT_DATA]: measurementDataSchema,
+// Hack to make a partial of this before using refine()
+const _measurementResultSchema = childSchema.extend({
+  [DBField.BODY_WEIGHT]: bodyWeightSchema.optional(),
+  [DBField.PERCENT]: percentSchema.optional(),
+  [DBField.INCHES]: inchesSchema.optional(),
+  [DBField.NUMBER]: numberSchema.optional(),
 })
 
-const partialMeasurementResultSchema = measurementResultSchema.deepPartial()
+export const measurementResultSchema = _measurementResultSchema.refine(
+  (obj) => {
+    const fieldArray = Object.keys(obj).filter((f) => measurementDataFields.includes(f as DBField))
+    const noUndefined = fieldArray.every((val) => val !== undefined)
+    const noWrongCount = fieldArray.length === 1
+    return noUndefined && noWrongCount
+  },
+  {
+    message: 'Must have exactly one valid measurement result data field',
+    path: measurementDataFields,
+  }
+)
+
+const partialMeasurementResultSchema = _measurementResultSchema.deepPartial()
 type MeasurementResultParams = z.infer<typeof partialMeasurementResultSchema>
 
 export class MeasurementResult extends Child {
-  [DBField.MEASUREMENT_DATA]?: MeasurementData
+  [DBField.BODY_WEIGHT]?: number;
+  [DBField.PERCENT]?: number;
+  [DBField.INCHES]?: number;
+  [DBField.NUMBER]?: number
 
   constructor({
     id,
@@ -56,10 +54,16 @@ export class MeasurementResult extends Child {
     activated,
     parentId,
     note,
-    measurementData,
+    bodyWeight,
+    percent,
+    inches,
+    number,
   }: MeasurementResultParams) {
     super({ id, createdTimestamp, activated, parentId, note })
-    this.measurementData = measurementData
+    this.bodyWeight = bodyWeight
+    this.percent = percent
+    this.inches = inches
+    this.number = number
   }
 
   static getLabel(style: 'singular' | 'plural') {
@@ -68,12 +72,40 @@ export class MeasurementResult extends Child {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldMeasurementData.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
+    ]
+  }
+
+  static getInspectionItems(): InspectionItem[] {
+    return [
+      ...Parent.getInspectionItems(),
+      {
+        field: DBField.BODY_WEIGHT,
+        label: MeasurementInput.BODY_WEIGHT,
+        output: 'single',
+        format: (val: number | undefined) => (val ? `${val} lbs` : '-'),
+      },
+      {
+        field: DBField.PERCENT,
+        label: MeasurementInput.PERCENT,
+        output: 'single',
+        format: (val: number | undefined) => (val ? `${val}%` : '-'),
+      },
+      {
+        field: DBField.INCHES,
+        label: MeasurementInput.INCHES,
+        output: 'single',
+        format: (val: number | undefined) => (val ? `${val} in` : '-'),
+      },
+      {
+        field: DBField.NUMBER,
+        label: MeasurementInput.NUMBER,
+        output: 'single',
+        format: (val: number | undefined) => (val ? `${val}` : '-'),
+      },
     ]
   }
 
@@ -81,64 +113,40 @@ export class MeasurementResult extends Child {
     return [
       ...Child.getTableColumns(),
       {
-        name: DBField.MEASUREMENT_DATA,
+        name: DBField.BODY_WEIGHT,
         label: MeasurementInput.BODY_WEIGHT,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.MEASUREMENT_DATA],
-        format: (val: Record<DBField, number | undefined>) => {
-          if (Object.keys(val).length > 0 && val?.bodyWeight) {
-            return `${val.bodyWeight} lbs`
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.BODY_WEIGHT],
+        format: (val: number | undefined) => (val ? `${val} lbs` : ''),
       },
       {
-        name: DBField.MEASUREMENT_DATA,
+        name: DBField.PERCENT,
         label: MeasurementInput.PERCENT,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.MEASUREMENT_DATA],
-        format: (val: Record<DBField, number | undefined>) => {
-          if (Object.keys(val).length > 0 && val?.percent) {
-            return `${val.percent}%`
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.PERCENT],
+        format: (val: number | undefined) => (val ? `${val}%` : ''),
       },
       {
-        name: DBField.MEASUREMENT_DATA,
+        name: DBField.INCHES,
         label: MeasurementInput.INCHES,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.MEASUREMENT_DATA],
-        format: (val: Record<DBField, number | undefined>) => {
-          if (Object.keys(val).length > 0 && val?.inches) {
-            return `${val.inches} in`
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.INCHES],
+        format: (val: number | undefined) => (val ? `${val} in` : ''),
       },
       {
-        name: DBField.MEASUREMENT_DATA,
+        name: DBField.NUMBER,
         label: MeasurementInput.NUMBER,
         align: 'left',
         sortable: true,
         required: false,
-        field: (row: any) => row[DBField.MEASUREMENT_DATA],
-        format: (val: Record<DBField, number | undefined>) => {
-          if (Object.keys(val).length > 0 && val?.number) {
-            return `${val.number}`
-          } else {
-            return ''
-          }
-        },
+        field: (row: any) => row[DBField.NUMBER],
+        format: (val: number | undefined) => (val ? `${val}` : ''),
       },
     ]
   }
