@@ -199,16 +199,12 @@ class Database extends Dexie {
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
 
-  async getSettings() {
-    return await this.Settings.toArray()
-  }
-
   async getSetting(key: SettingKey) {
-    return await this.Settings.get(key)
+    return await this.table(InternalTable.SETTINGS).get(key)
   }
 
   async getSettingValue(key: SettingKey) {
-    return (await this.Settings.get(key))?.value
+    return (await this.table(InternalTable.SETTINGS).get(key))?.value
   }
 
   async initSettings() {
@@ -228,7 +224,7 @@ class Database extends Dexie {
 
     const settings = await Promise.all(
       keys.map(async (key) => {
-        const setting = await this.Settings.get(key)
+        const setting = await this.table(InternalTable.SETTINGS).get(key)
 
         if (setting) {
           return setting
@@ -247,7 +243,7 @@ class Database extends Dexie {
     if (key === SettingKey.DARK_MODE) {
       Dark.set(Boolean(value))
     }
-    return await this.Settings.put(settingSchema.parse({ key, value }))
+    return await this.table(InternalTable.SETTINGS).put(settingSchema.parse({ key, value }))
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -256,28 +252,25 @@ class Database extends Dexie {
   //                                                                         //
   /////////////////////////////////////////////////////////////////////////////
 
-  async getLogs() {
-    return await this.Logs.toArray()
-  }
-
   async getLog(autoId: number) {
-    return await this.Logs.get(autoId)
+    return await this.table(InternalTable.LOGS).get(autoId)
   }
 
   async addLog(logLevel: LogLevel, logLabel: string, details?: LogDetails) {
     const log = new Log(logLevel, logLabel, details)
-    return await this.Logs.add(logSchema.parse(log))
+    return await this.table(InternalTable.LOGS).add(logSchema.parse(log))
   }
 
   async purgeLogs() {
-    const logDuration = (await this.Settings.get(SettingKey.LOG_RETENTION_DURATION))
-      ?.value as Duration
+    const logDuration = (
+      await this.table(InternalTable.SETTINGS).get(SettingKey.LOG_RETENTION_DURATION)
+    )?.value as Duration
 
     if (!logDuration || logDuration === Duration.Forever) {
       return 0 // No logs purged
     }
 
-    const logs = await this.Logs.toArray()
+    const logs = await this.table(InternalTable.LOGS).toArray()
 
     // Find Logs that are older than the retention time and map them to their keys
     const removableLogs = logs
@@ -288,7 +281,7 @@ class Database extends Dexie {
       })
       .map((log: Log) => log.autoId) // Map remaining Log ids for removal
 
-    await this.Logs.bulkDelete(removableLogs)
+    await this.table(InternalTable.LOGS).bulkDelete(removableLogs)
 
     return removableLogs.length // Number of logs deleted
   }
@@ -300,11 +293,13 @@ class Database extends Dexie {
   /////////////////////////////////////////////////////////////////////////////
 
   liveSettings() {
-    return liveQuery(() => this.Settings.toArray())
+    return liveQuery(() => this.table(InternalTable.SETTINGS).toArray())
   }
 
   liveLogs() {
-    return liveQuery(() => this.Logs.orderBy(InternalField.AUTO_ID).reverse().toArray())
+    return liveQuery(() =>
+      this.table(InternalTable.LOGS).orderBy(InternalField.AUTO_ID).reverse().toArray()
+    )
   }
 
   private _sortDashboardData<T extends AnyDBRecord>(records: T[]) {
@@ -435,15 +430,23 @@ class Database extends Dexie {
       appName: AppName,
       databaseVersion: AppDatabaseVersion,
       createdTimestamp: Date.now(),
-      Settings: await this.Settings.toArray(),
-      Logs: await this.Logs.toArray(),
-      Workouts: this.cleanParents<Workout>(await this.Workouts.toArray()),
-      Exercises: this.cleanParents<Exercise>(await this.Exercises.toArray()),
-      Measurements: this.cleanParents<Measurement>(await this.Measurements.toArray()),
-      WorkoutResults: this.cleanChildren<WorkoutResult>(await this.WorkoutResults.toArray()),
-      ExerciseResults: this.cleanChildren<ExerciseResult>(await this.ExerciseResults.toArray()),
-      MeasurementResults: this.cleanChildren<MeasurementResult>(
-        await this.MeasurementResults.toArray()
+      [InternalTable.SETTINGS]: await this.table(InternalTable.SETTINGS).toArray(),
+      [InternalTable.LOGS]: await this.table(InternalTable.LOGS).toArray(),
+      [DBTable.WORKOUTS]: this.cleanParents<Workout>(await this.table(DBTable.WORKOUTS).toArray()),
+      [DBTable.EXERCISES]: this.cleanParents<Exercise>(
+        await this.table(DBTable.EXERCISES).toArray()
+      ),
+      [DBTable.MEASUREMENTS]: this.cleanParents<Measurement>(
+        await this.table(DBTable.MEASUREMENTS).toArray()
+      ),
+      [DBTable.WORKOUT_RESULTS]: this.cleanChildren<WorkoutResult>(
+        await this.table(DBTable.WORKOUT_RESULTS).toArray()
+      ),
+      [DBTable.EXERCISE_RESULTS]: this.cleanChildren<ExerciseResult>(
+        await this.table(DBTable.EXERCISE_RESULTS).toArray()
+      ),
+      [DBTable.MEASUREMENT_RESULTS]: this.cleanChildren<MeasurementResult>(
+        await this.table(DBTable.MEASUREMENT_RESULTS).toArray()
       ),
     }
 
@@ -672,11 +675,11 @@ class Database extends Dexie {
   }
 
   async clearLogs() {
-    return await this.Logs.clear()
+    return await this.table(InternalTable.LOGS).clear()
   }
 
   async clearSettings() {
-    await this.Settings.clear()
+    await this.table(InternalTable.SETTINGS).clear()
     return await this.initSettings()
   }
 

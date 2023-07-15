@@ -3,6 +3,7 @@ import { Parent, parentSchema } from '@/models/_Parent'
 import { DBField } from '@/types/database'
 import { defineAsyncComponent } from 'vue'
 import type { QTableColumn } from 'quasar'
+import { truncateString } from '@/utils/common'
 
 export enum ExerciseInput {
   REPS = 'Reps',
@@ -53,12 +54,12 @@ export class Exercise extends Parent {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
+      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
     ]
   }
@@ -68,6 +69,26 @@ export class Exercise extends Parent {
   }
 
   static getTableColumns(): QTableColumn[] {
-    return [...Parent.getTableColumns()]
+    return [
+      ...Parent.getTableColumns(),
+      {
+        name: DBField.EXERCISE_INPUTS,
+        label: 'Exercise Inputs',
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.EXERCISE_INPUTS],
+        format: (val: ExerciseInput[]) => truncateString(val ? val?.join(', ') : '', 30, '...'),
+      },
+      {
+        name: DBField.MULTIPLE_SETS,
+        label: 'Favorited',
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.MULTIPLE_SETS],
+        format: (val: boolean) => (val ? 'Yes' : 'No'),
+      },
+    ]
   }
 }

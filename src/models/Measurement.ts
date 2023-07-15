@@ -44,12 +44,13 @@ export class Measurement extends Parent {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
+      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldMeasurementInput.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
     ]
   }
@@ -59,6 +60,17 @@ export class Measurement extends Parent {
   }
 
   static getTableColumns(): QTableColumn[] {
-    return [...Parent.getTableColumns()]
+    return [
+      ...Parent.getTableColumns(),
+      {
+        name: DBField.MEASUREMENT_INPUT,
+        label: 'Measurement Input',
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.MEASUREMENT_INPUT],
+        format: (val: MeasurementInput) => `${val}`,
+      },
+    ]
   }
 }

@@ -25,6 +25,9 @@ const isFormValid = ref(true)
 
 onMounted(async () => {
   try {
+    // Table being used for the action
+    actionStore.table = routeTable as DBTable
+
     // Load record to edit
     const editRecord = await DB.getRecord(routeTable as DBTable, routeId as string)
 

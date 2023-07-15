@@ -15,7 +15,7 @@ const { route, routeTable } = useRouting()
 const { log } = useLogger()
 const actionStore = useActionStore()
 
-const options: Ref<{ value: string; label: string }[]> = ref([])
+const options: Ref<{ value: string; label: string; disable: boolean }[]> = ref([])
 
 onMounted(async () => {
   try {

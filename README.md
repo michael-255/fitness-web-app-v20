@@ -4,7 +4,8 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
-- WIP
+- [ ] Fix `Model` field components
+- [ ] WIP
 
 ## Table of Contents
 

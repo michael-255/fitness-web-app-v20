@@ -9,8 +9,8 @@ import type { WorkoutResult } from '@/models/WorkoutResult'
 import { z } from 'zod'
 
 export enum InternalTable {
-  SETTINGS = 'Settings',
-  LOGS = 'Logs',
+  SETTINGS = 'settings',
+  LOGS = 'logs',
 }
 
 export enum InternalField {
@@ -32,12 +32,12 @@ export enum InternalField {
  * First table must be a Parent table for UI store dashboard selection default
  */
 export enum DBTable {
-  WORKOUTS = 'Workouts',
-  EXERCISES = 'Exercises',
-  MEASUREMENTS = 'Measurements',
-  WORKOUT_RESULTS = 'WorkoutResults',
-  EXERCISE_RESULTS = 'ExerciseResults',
-  MEASUREMENT_RESULTS = 'MeasurementResults',
+  WORKOUTS = 'workouts',
+  EXERCISES = 'exercises',
+  MEASUREMENTS = 'measurements',
+  WORKOUT_RESULTS = 'workout-results',
+  EXERCISE_RESULTS = 'exercise-results',
+  MEASUREMENT_RESULTS = 'measurement-results',
 }
 
 export type ParentTable = DBTable.WORKOUTS | DBTable.EXERCISES | DBTable.MEASUREMENTS
@@ -99,7 +99,6 @@ export enum DBField {
   BODY_WEIGHT = 'bodyWeight',
   PERCENT = 'percent',
   INCHES = 'inches',
-  LBS = 'lbs',
   NUMBER = 'number',
 }
 

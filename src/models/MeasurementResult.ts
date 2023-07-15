@@ -3,12 +3,12 @@ import { DBField } from '@/types/database'
 import type { QTableColumn } from 'quasar'
 import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
+import { MeasurementInput } from './Measurement'
 
 export const measurementDataFields = [
   DBField.BODY_WEIGHT,
   DBField.PERCENT,
   DBField.INCHES,
-  DBField.LBS,
   DBField.NUMBER,
 ]
 
@@ -19,10 +19,10 @@ export const numberSchema = z.number().min(Number.MIN_SAFE_INTEGER).max(Number.M
 
 export const measurementDataSchema = z
   .object({
-    [DBField.BODY_WEIGHT]: bodyWeightSchema,
-    [DBField.PERCENT]: percentSchema,
-    [DBField.INCHES]: inchesSchema,
-    [DBField.NUMBER]: numberSchema,
+    [DBField.BODY_WEIGHT]: bodyWeightSchema.optional(),
+    [DBField.PERCENT]: percentSchema.optional(),
+    [DBField.INCHES]: inchesSchema.optional(),
+    [DBField.NUMBER]: numberSchema.optional(),
   })
   .refine(
     (obj) => {
@@ -68,15 +68,78 @@ export class MeasurementResult extends Child {
 
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
+      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldMeasurementData.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldId.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldActivated.vue')),
     ]
   }
 
   static getTableColumns(): QTableColumn[] {
-    return [...Child.getTableColumns()]
+    return [
+      ...Child.getTableColumns(),
+      {
+        name: DBField.MEASUREMENT_DATA,
+        label: MeasurementInput.BODY_WEIGHT,
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.MEASUREMENT_DATA],
+        format: (val: Record<DBField, number | undefined>) => {
+          if (Object.keys(val).length > 0 && val?.bodyWeight) {
+            return `${val.bodyWeight} lbs`
+          } else {
+            return ''
+          }
+        },
+      },
+      {
+        name: DBField.MEASUREMENT_DATA,
+        label: MeasurementInput.PERCENT,
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.MEASUREMENT_DATA],
+        format: (val: Record<DBField, number | undefined>) => {
+          if (Object.keys(val).length > 0 && val?.percent) {
+            return `${val.percent}%`
+          } else {
+            return ''
+          }
+        },
+      },
+      {
+        name: DBField.MEASUREMENT_DATA,
+        label: MeasurementInput.INCHES,
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.MEASUREMENT_DATA],
+        format: (val: Record<DBField, number | undefined>) => {
+          if (Object.keys(val).length > 0 && val?.inches) {
+            return `${val.inches} in`
+          } else {
+            return ''
+          }
+        },
+      },
+      {
+        name: DBField.MEASUREMENT_DATA,
+        label: MeasurementInput.NUMBER,
+        align: 'left',
+        sortable: true,
+        required: false,
+        field: (row: any) => row[DBField.MEASUREMENT_DATA],
+        format: (val: Record<DBField, number | undefined>) => {
+          if (Object.keys(val).length > 0 && val?.number) {
+            return `${val.number}`
+          } else {
+            return ''
+          }
+        },
+      },
+    ]
   }
 }

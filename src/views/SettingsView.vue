@@ -6,10 +6,11 @@ import { AppName } from '@/constants/global'
 import { useMeta } from 'quasar'
 import { Setting, SettingKey } from '@/models/Setting'
 import { DBTable, type BackupData } from '@/types/database'
+import { z } from 'zod'
 import useLogger from '@/composables/useLogger'
 import useNotifications from '@/composables/useNotifications'
 import useDialogs from '@/composables/useDialogs'
-// import useDefaults from '@/composables/useDefaults'
+import useDefaults from '@/composables/useDefaults'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import useRouting from '@/composables/useRouting'
 import DB from '@/services/Database'
@@ -19,10 +20,20 @@ useMeta({ title: `${AppName} - Settings` })
 const { log } = useLogger()
 const { notify } = useNotifications()
 const { confirmDialog } = useDialogs()
-// const { } = useDefaults()
+const {
+  onAddBarbellStrengthWorkouts,
+  onAddStretchRoutine,
+  onAddCarpalTunnelRoutine,
+  onAddDeepBreathingRoutine,
+  onAddStandardMeasurements,
+} = useDefaults()
 const { goToLogsData } = useRouting()
 
+const heightSchema = z.number().positive().min(1).max(120).optional()
+
 const settings: Ref<Setting[]> = ref([])
+const heightInputRef: Ref<any> = ref(null)
+const heightInches: Ref<number | undefined> = ref(undefined)
 const logDurationIndex: Ref<number> = ref(0)
 const importFile: Ref<any> = ref(null)
 const logDurationKeys = [
@@ -225,13 +236,47 @@ async function onDeleteDatabase() {
   )
 }
 
-function getSettingValue(key: SettingKey) {
+function getLiveSettingValue(key: SettingKey) {
   return settings.value.find((s) => s.key === key)?.value
+}
+
+async function updateHeight() {
+  if (!heightInches.value) {
+    heightInches.value = undefined
+  }
+
+  if (heightInputRef?.value?.validate()) {
+    await DB.setSetting(SettingKey.USER_HEIGHT_INCHES, heightInches.value)
+  }
 }
 </script>
 
 <template>
   <ResponsivePage :bannerIcon="Icon.SETTINGS" bannerTitle="Settings">
+    <section class="q-mb-xl">
+      <div class="text-h6 q-mb-md">User Information</div>
+
+      <p>
+        Your height is used for the BMI calculation when updating your body weight fi you provide
+        it. For reference, a height of 5'10" is equal to 70 inches.
+      </p>
+
+      <p class="text-h6">Height</p>
+
+      <QInput
+        v-model.number="heightInches"
+        ref="heightInputRef"
+        :rules="[(val: number) => heightSchema.safeParse(val).success || 'Must be 1-120 or empty']"
+        hint="Auto Saved"
+        type="number"
+        placeholder="Total Inches"
+        dense
+        outlined
+        color="primary"
+        @update:model-value="updateHeight()"
+      />
+    </section>
+
     <section class="q-mb-xl">
       <p class="text-h6">Options</p>
 
@@ -246,7 +291,7 @@ function getSettingValue(key: SettingKey) {
         </p>
         <QToggle
           label="Show Welcome Overlay"
-          :model-value="getSettingValue(SettingKey.WELCOME_OVERLAY)"
+          :model-value="getLiveSettingValue(SettingKey.WELCOME_OVERLAY)"
           @update:model-value="DB.setSetting(SettingKey.WELCOME_OVERLAY, $event)"
         />
       </div>
@@ -255,7 +300,7 @@ function getSettingValue(key: SettingKey) {
         <p>Show descriptions for records displayed on the Dashboard page.</p>
         <QToggle
           label="Show Dashboard Descriptions"
-          :model-value="getSettingValue(SettingKey.DASHBOARD_DESCRIPTIONS)"
+          :model-value="getLiveSettingValue(SettingKey.DASHBOARD_DESCRIPTIONS)"
           @update:model-value="DB.setSetting(SettingKey.DASHBOARD_DESCRIPTIONS, $event)"
         />
       </div>
@@ -264,7 +309,7 @@ function getSettingValue(key: SettingKey) {
         <p>Dark mode allows you to switch between a light or dark theme for the app.</p>
         <QToggle
           label="Dark Mode"
-          :model-value="getSettingValue(SettingKey.DARK_MODE)"
+          :model-value="getLiveSettingValue(SettingKey.DARK_MODE)"
           @update:model-value="DB.setSetting(SettingKey.DARK_MODE, $event)"
         />
       </div>
@@ -274,14 +319,38 @@ function getSettingValue(key: SettingKey) {
       <p class="text-h6">Defaults</p>
 
       <div>
-        <p>Load default demostration records into the database. This action can be repeated.</p>
+        <p>Load default records into the database to get started using the app.</p>
 
         <div class="q-mb-md">
-          <!-- <QBtn label="Examples" color="primary" @click="onDefaultExamples()" /> -->
+          <QBtn
+            label="Barbell Strength Workouts"
+            color="primary"
+            @click="onAddBarbellStrengthWorkouts()"
+          />
+        </div>
+
+        <div class="q-mb-md">
+          <QBtn label="Stretch Routine" color="primary" @click="onAddStretchRoutine()" />
+        </div>
+
+        <div class="q-mb-md">
+          <QBtn label="Carpel Tunnel Routine" color="primary" @click="onAddCarpalTunnelRoutine()" />
+        </div>
+
+        <div class="q-mb-md">
+          <QBtn
+            label="Deep Breathing Routine"
+            color="primary"
+            @click="onAddDeepBreathingRoutine()"
+          />
         </div>
 
         <div>
-          <!-- <QBtn label="Tests" color="primary" @click="onDefaultTests()" /> -->
+          <QBtn
+            label="Standard Measurements"
+            color="primary"
+            @click="onAddStandardMeasurements()"
+          />
         </div>
       </div>
     </section>
@@ -348,7 +417,7 @@ function getSettingValue(key: SettingKey) {
         <p>Show Console Logs will display all log messages in the browser console.</p>
         <QToggle
           label="Show Console Logs"
-          :model-value="getSettingValue(SettingKey.CONSOLE_LOGS)"
+          :model-value="getLiveSettingValue(SettingKey.CONSOLE_LOGS)"
           @update:model-value="DB.setSetting(SettingKey.CONSOLE_LOGS, $event)"
         />
       </div>
@@ -357,7 +426,7 @@ function getSettingValue(key: SettingKey) {
         <p>Show Info Messages will display info level notifications.</p>
         <QToggle
           label="Show Info Messages"
-          :model-value="getSettingValue(SettingKey.INFO_MESSAGES)"
+          :model-value="getLiveSettingValue(SettingKey.INFO_MESSAGES)"
           @update:model-value="DB.setSetting(SettingKey.INFO_MESSAGES, $event)"
         />
       </div>

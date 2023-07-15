@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { date } from 'quasar'
-import { onMounted, type Ref, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Icon } from '@/types/general'
 import { getDisplayDate } from '@/utils/common'
 import useActionStore from '@/stores/action'
@@ -11,9 +11,9 @@ defineProps<{
 
 const actionStore = useActionStore()
 
-const displayDate: Ref<string> = ref('')
-const datePicker: Ref<string> = ref('')
-const timePicker: Ref<string> = ref('')
+const displayDate = ref('')
+const datePicker = ref('')
+const timePicker = ref('')
 
 onMounted(() => {
   const existingTime = actionStore.record.createdTimestamp ?? Date.now()

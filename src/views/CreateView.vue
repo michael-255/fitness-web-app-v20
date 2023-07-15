@@ -3,7 +3,7 @@ import { Icon } from '@/types/general'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { extend, uid, useMeta } from 'quasar'
 import { AppName } from '@/constants/global'
-import type { DBTable } from '@/types/database'
+import { DBTable } from '@/types/database'
 import ErrorStates from '@/components/ErrorStates.vue'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import useActionStore from '@/stores/action'
@@ -25,12 +25,24 @@ const isFormValid = ref(true)
 
 onMounted(async () => {
   try {
+    // Table being used for the action
+    actionStore.table = routeTable as DBTable
+
     // Load default record
     actionStore.record = DB.getDefaultActionRecord(routeTable as DBTable)
 
     // Parent id is provided when attaching a child record from the Dashboard
     if (routeParentId) {
       actionStore.record.parentId = routeParentId
+
+      // Load measurement input from parent record
+      if (routeTable === DBTable.MEASUREMENT_RESULTS) {
+        const measurement = await DB.getRecord(DBTable.MEASUREMENTS, routeParentId)
+
+        if (measurement) {
+          actionStore.measurementInput = measurement.measurementInput
+        }
+      }
     }
   } catch (error) {
     log.error('Error loading create view', error)
