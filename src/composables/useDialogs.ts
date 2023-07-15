@@ -1,7 +1,6 @@
 import { useQuasar } from 'quasar'
 import { Icon } from '@/types/general'
 import type { AnyDBRecord, DBTable, InternalTable, ParentTable } from '@/types/database'
-import type { defineAsyncComponent } from 'vue'
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
 import DismissalDialog from '@/components/dialogs/DismissalDialog.vue'
 import InspectionDialog from '@/components/dialogs/InspectionDialog.vue'

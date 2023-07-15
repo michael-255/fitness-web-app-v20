@@ -3,7 +3,6 @@ import { createdTimestampSchema } from '@/models/_Entity'
 import type { QTableColumn } from 'quasar'
 import { getDisplayDate, truncateString } from '@/utils/common'
 import { z } from 'zod'
-import { defineAsyncComponent } from 'vue'
 
 export enum LogLevel {
   DEBUG = 'DEBUG',

@@ -5,7 +5,7 @@ import { type Ref, ref, onUnmounted } from 'vue'
 import { AppName } from '@/constants/global'
 import { useMeta } from 'quasar'
 import { Setting, SettingKey } from '@/models/Setting'
-import { DBTable, type BackupData } from '@/types/database'
+import { DBTable, type BackupData, InternalTable } from '@/types/database'
 import { z } from 'zod'
 import useLogger from '@/composables/useLogger'
 import useNotifications from '@/composables/useNotifications'
@@ -94,11 +94,11 @@ function onImportFile() {
         }
 
         // Import settings first in case errors stop type importing below
-        if (backupData.Settings.length > 0) {
+        if (backupData[InternalTable.SETTINGS].length > 0) {
           await Promise.all(
-            backupData.Settings.filter((setting) =>
-              Object.values(SettingKey).includes(setting.key)
-            ).map(async (setting) => await DB.setSetting(setting.key, setting.value))
+            backupData[InternalTable.SETTINGS]
+              .filter((setting) => Object.values(SettingKey).includes(setting.key))
+              .map(async (setting) => await DB.setSetting(setting.key, setting.value))
           )
         }
 
