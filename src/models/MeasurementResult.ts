@@ -73,7 +73,10 @@ export class MeasurementResult extends Child {
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
-      defineAsyncComponent(() => import('@/components/fields/FieldMeasurementData.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldBodyWeight.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldPercent.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldInches.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldNumber.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
     ]
