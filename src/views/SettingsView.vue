@@ -9,7 +9,7 @@ import { DBTable, type BackupData } from '@/types/database'
 import useLogger from '@/composables/useLogger'
 import useNotifications from '@/composables/useNotifications'
 import useDialogs from '@/composables/useDialogs'
-import useDefaults from '@/composables/useDefaults'
+// import useDefaults from '@/composables/useDefaults'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import useRouting from '@/composables/useRouting'
 import DB from '@/services/Database'
@@ -19,7 +19,7 @@ useMeta({ title: `${AppName} - Settings` })
 const { log } = useLogger()
 const { notify } = useNotifications()
 const { confirmDialog } = useDialogs()
-const { onDefaultExamples, onDefaultTests } = useDefaults()
+// const { } = useDefaults()
 const { goToLogsData } = useRouting()
 
 const settings: Ref<Setting[]> = ref([])
@@ -277,11 +277,11 @@ function getSettingValue(key: SettingKey) {
         <p>Load default demostration records into the database. This action can be repeated.</p>
 
         <div class="q-mb-md">
-          <QBtn label="Examples" color="primary" @click="onDefaultExamples()" />
+          <!-- <QBtn label="Examples" color="primary" @click="onDefaultExamples()" /> -->
         </div>
 
         <div>
-          <QBtn label="Tests" color="primary" @click="onDefaultTests()" />
+          <!-- <QBtn label="Tests" color="primary" @click="onDefaultTests()" /> -->
         </div>
       </div>
     </section>

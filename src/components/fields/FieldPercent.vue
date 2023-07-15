@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { percentSchema } from '@/models/ExampleResults'
+import { percentSchema } from '@/models/MeasurementResult'
 import useActionStore from '@/stores/action'
 
 defineProps<{
