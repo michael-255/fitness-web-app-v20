@@ -20,8 +20,7 @@ const elapsedTime = ref('')
 
 onMounted(async () => {
   try {
-    const activeRecords = await DB.getActiveWorkout()
-    const { parentWorkout, workoutResult } = activeRecords
+    const { parentWorkout, workoutResult } = await DB.getActiveWorkout()
 
     // Parent fields for display
     if (parentWorkout) {
@@ -59,7 +58,14 @@ watch(counter, () => {
     <QHeader elevated :class="`bg-${AppHeaderColor}`">
       <QToolbar>
         <QToolbarTitle class="q-ml-xs">{{ title }}</QToolbarTitle>
-        <QBtn v-if="note" flat round :icon="Icon.NOTE" @click="viewPreviousWorkoutNote()" />
+        <QBtn
+          v-if="note"
+          flat
+          round
+          :icon="Icon.NOTE"
+          class="q-mr-xs"
+          @click="viewPreviousWorkoutNote()"
+        />
         <QBtn flat round :icon="Icon.BACK" :to="{ name: RouteName.DASHBOARD }" />
       </QToolbar>
     </QHeader>

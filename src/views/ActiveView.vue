@@ -2,9 +2,13 @@
 import { Icon } from '@/types/general'
 import { AppName } from '@/constants/global'
 import { useMeta } from 'quasar'
-import { onMounted, ref, type Ref } from 'vue'
-import type { AnyDBRecord } from '@/types/database'
+import { onUnmounted, ref, type Ref } from 'vue'
+import type { Workout } from '@/models/Workout'
+import type { Exercise } from '@/models/Exercise'
+import type { WorkoutResult } from '@/models/WorkoutResult'
+import type { ExerciseResult } from '@/models/ExerciseResult'
 import ResponsivePage from '@/components/ResponsivePage.vue'
+import ActiveExerciseCard from '@/components/active-workout/ActiveExerciseCard.vue'
 import useLogger from '@/composables/useLogger'
 import useDialogs from '@/composables/useDialogs'
 import useRouting from '@/composables/useRouting'
@@ -17,11 +21,25 @@ const { confirmDialog } = useDialogs()
 const { goToDashboard } = useRouting()
 
 const isFormValid = ref(true)
-const activeRecords: Ref<Record<string, AnyDBRecord | AnyDBRecord[]>> = ref({})
+const parentWorkout: Ref<Workout> = ref({})
+const parentExercises: Ref<Exercise[]> = ref([])
+const workoutResult: Ref<WorkoutResult> = ref({})
+const exerciseResults: Ref<ExerciseResult[]> = ref([])
 
-onMounted(async () => {
-  activeRecords.value = await DB.getActiveWorkout()
-  log.info('Active Workout', { ...activeRecords.value })
+const activeWorkoutSubscription = DB.liveActiveWorkout().subscribe({
+  next: (liveData) => {
+    parentWorkout.value = liveData.parentWorkout
+    parentExercises.value = liveData.parentExercises
+    workoutResult.value = liveData.workoutResult
+    exerciseResults.value = liveData.exerciseResults
+
+    log.info('Live Active Workout', { ...liveData }) // TODO - Temp for building
+  },
+  error: (error) => log.error('Error fetching live Active Workout', error),
+})
+
+onUnmounted(() => {
+  activeWorkoutSubscription.unsubscribe()
 })
 
 async function onSubmit() {
@@ -40,17 +58,27 @@ async function onSubmit() {
     }
   )
 }
+
+function getExerciseParent(parentExerciseId: string) {
+  return (parentExercises.value.find((e) => e.id === parentExerciseId) || {}) as Exercise
+}
 </script>
 
 <template>
-  <ResponsivePage :bannerIcon="Icon.INFO" bannerTitle="Active Workout">
+  <ResponsivePage>
     <QForm
       @submit="onSubmit"
       @validation-error="isFormValid = false"
       @validation-success="isFormValid = true"
     >
-      <!-- Workout -->
-      <div>TEST</div>
+      <!-- Workout Exercises -->
+      <ActiveExerciseCard
+        v-for="er in exerciseResults"
+        :key="er.id"
+        :parentExercise="getExerciseParent(er.parentId as string)"
+        :exerciseResult="er"
+        class="q-mb-md"
+      />
 
       <!-- Submit -->
       <div class="row justify-center q-my-sm">
