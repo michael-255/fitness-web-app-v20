@@ -2,7 +2,7 @@
   "name": "fitness-web-app-v19",
   "description": "Fitness Tracker is for tracking workouts, exercises, and measurements as well as charting results.",
   "author": "Michael Joy",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
