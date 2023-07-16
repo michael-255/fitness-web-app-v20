@@ -44,7 +44,7 @@ const { log } = useLogger()
 useChartTimeWatcher(recalculateChart)
 
 const recordCount: Ref<number> = ref(0)
-const chartLabel = MeasurementInput.PERCENT
+const chartLabel = MeasurementInput.NUMBER
 
 const chartOptions = {
   reactive: true,
@@ -57,7 +57,9 @@ const chartOptions = {
     },
     tooltip: {
       callbacks: {
-        title: (tooltipItem: any) => tooltipItem?.[0]?.label ?? '',
+        title: (tooltipItem: any) => {
+          return date.formatDate(tooltipItem?.[0]?.label, 'ddd, YYYY MMM D, h:mm a')
+        },
       },
     },
   },
@@ -115,7 +117,7 @@ async function recalculateChart() {
       )
 
       // Create chart data from the number fields
-      const chartDataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.percent)
+      const chartDataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.number)
 
       // Set chart data with the labels and data
       chartData.value = {
@@ -135,7 +137,7 @@ async function recalculateChart() {
       }
     }
   } catch (error) {
-    log.error('Error loading percent chart', error)
+    log.error('Error loading number chart', error)
   }
 }
 </script>

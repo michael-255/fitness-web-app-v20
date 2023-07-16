@@ -44,7 +44,7 @@ const { log } = useLogger()
 useChartTimeWatcher(recalculateChart)
 
 const recordCount: Ref<number> = ref(0)
-const chartLabel = MeasurementInput.PERCENT
+const chartLabel = MeasurementInput.BODY_WEIGHT
 
 const chartOptions = {
   reactive: true,
@@ -57,7 +57,9 @@ const chartOptions = {
     },
     tooltip: {
       callbacks: {
-        title: (tooltipItem: any) => tooltipItem?.[0]?.label ?? '',
+        title: (tooltipItem: any) => {
+          return date.formatDate(tooltipItem?.[0]?.label, 'ddd, YYYY MMM D, h:mm a')
+        },
       },
     },
   },
@@ -109,13 +111,13 @@ async function recalculateChart() {
 
       recordCount.value = timeRestrictedRecords.length
 
-      // X-axis labels
+      // Create chart label dates from the created timestamps
       const chartLabels = timeRestrictedRecords.map((record: AnyDBRecord) =>
         date.formatDate(record.createdTimestamp, 'YYYY MMM D')
       )
 
       // Create chart data from the number fields
-      const chartDataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.percent)
+      const chartDataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.bodyWeight)
 
       // Set chart data with the labels and data
       chartData.value = {
@@ -135,20 +137,22 @@ async function recalculateChart() {
       }
     }
   } catch (error) {
-    log.error('Error loading percent chart', error)
+    log.error('Error loading body weight chart', error)
   }
 }
 </script>
 
 <template>
-  <section v-if="recordCount > 0">
-    <p class="text-h6">
-      {{ chartLabel }}
-      <QBadge rounded color="secondary" class="q-py-none">
-        <span class="text-caption">{{ recordCount }} records in time frame</span>
-      </QBadge>
-    </p>
+  <p class="text-h6">
+    {{ chartLabel }}
+    <QBadge rounded color="secondary" class="q-py-none">
+      <span class="text-caption">{{ recordCount }} records in time frame</span>
+    </QBadge>
+  </p>
 
+  <div v-if="recordCount > 0">
     <Line :options="chartOptions" :data="chartData" style="max-height: 500px" />
-  </section>
+  </div>
+
+  <ErrorStates v-else error="no-data" />
 </template>

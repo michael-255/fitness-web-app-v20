@@ -69,7 +69,7 @@ function chartTimeRule(time: string) {
           @blur="!!inputRef?.value?.validate()"
         />
 
-        <div v-for="(chart, i) in chartComponents" :key="i" class="q-mb-md">
+        <div v-for="(chart, i) in chartComponents" :key="i" class="q-mb-xl">
           <component :is="chart" :id="id" :parentTable="parentTable" />
         </div>
       </QCardSection>

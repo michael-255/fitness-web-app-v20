@@ -53,7 +53,12 @@ export class Measurement extends Parent {
   }
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
-    return []
+    return [
+      defineAsyncComponent(() => import('@/components/charts/ChartBodyWeight.vue')),
+      defineAsyncComponent(() => import('@/components/charts/ChartPercent.vue')),
+      defineAsyncComponent(() => import('@/components/charts/ChartInches.vue')),
+      defineAsyncComponent(() => import('@/components/charts/ChartNumber.vue')),
+    ]
   }
 
   static getInspectionItems(): InspectionItem[] {
