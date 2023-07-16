@@ -520,9 +520,52 @@ class Database extends Dexie {
 
     return records.map((r: AnyDBRecord) => ({
       value: r.id,
-      label: `${r.name} (${truncateString(r.id, 8, '*')})`,
+      label: r.id,
       disable: r.activated,
     }))
+  }
+
+  async isActiveWorkout() {
+    // Get active records
+    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+      (w) => w.activated === true
+    )[0]
+    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+      (e) => e.activated === true
+    )
+    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
+      (wr) => wr.activated === true
+    )[0]
+    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
+      (er) => er.activated === true
+    )
+
+    return (
+      parentWorkout || parentExercises.length > 0 || workoutResult || exerciseResults.length > 0
+    )
+  }
+
+  async getActiveWorkout() {
+    // Get active records
+    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+      (w) => w.activated === true
+    )[0]
+    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+      (e) => e.activated === true
+    )
+    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
+      (wr) => wr.activated === true
+    )[0]
+    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
+      (er) => er.activated === true
+    )
+
+    return {
+      parentWorkout,
+      parentExercises,
+      workoutResult,
+      exerciseResults,
+    }
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -661,7 +704,9 @@ class Database extends Dexie {
         .where(DBField.PARENT_ID)
         .equals(id)
         .sortBy(DBField.CREATED_TIMESTAMP)
-    ).reverse()[0] as AnyDBRecord | undefined
+    )
+      .filter((i) => i.activated !== true)
+      .reverse()[0] as AnyDBRecord | undefined
 
     return await this.table(parentTable).update(id, { previousChild })
   }
@@ -680,13 +725,115 @@ class Database extends Dexie {
     }
   }
 
-  async toggleActive(table: DBTable, id: string) {
-    const record = (await this.getRecord(table, id)) as AnyDBRecord | undefined
+  async beginWorkout(workoutId: string) {
+    const parentWorkout = await this.table(DBTable.WORKOUTS).get(workoutId)
+    const parentExercises = await Promise.all(
+      parentWorkout.exerciseIds.map(
+        async (id: string) => await this.table(DBTable.EXERCISES).get(id)
+      )
+    )
 
-    if (record && record.activated !== undefined) {
-      record.activated = !record.activated
-      return await this.putRecord(table, record)
-    }
+    // Activate parent records
+    parentWorkout.activated = true
+    await this.table(DBTable.WORKOUTS).put(parentWorkout)
+    parentExercises.forEach((pe: Exercise) => (pe.activated = true))
+    await this.table(DBTable.EXERCISES).bulkPut(parentExercises)
+
+    // Create new child records
+    const exerciseResults = parentExercises.map((pe: Exercise) => {
+      return new ExerciseResult({
+        id: uid(),
+        createdTimestamp: Date.now(),
+        activated: true,
+        parentId: pe.id,
+        note: '',
+        reps: pe.exerciseInputs?.includes(ExerciseInput.REPS) ? [] : undefined,
+        weightLbs: pe.exerciseInputs?.includes(ExerciseInput.WEIGHT) ? [] : undefined,
+        distanceMiles: pe.exerciseInputs?.includes(ExerciseInput.DISTANCE) ? [] : undefined,
+        durationMinutes: pe.exerciseInputs?.includes(ExerciseInput.DURATION) ? [] : undefined,
+        watts: pe.exerciseInputs?.includes(ExerciseInput.WATTS) ? [] : undefined,
+        speedMph: pe.exerciseInputs?.includes(ExerciseInput.SPEED) ? [] : undefined,
+        resistance: pe.exerciseInputs?.includes(ExerciseInput.RESISTANCE) ? [] : undefined,
+        incline: pe.exerciseInputs?.includes(ExerciseInput.INCLINE) ? [] : undefined,
+        calories: pe.exerciseInputs?.includes(ExerciseInput.CALORIES) ? [] : undefined,
+      })
+    })
+
+    const workoutResult = new WorkoutResult({
+      id: uid(),
+      createdTimestamp: Date.now(),
+      activated: true,
+      parentId: parentWorkout.id,
+      note: '',
+      finishedTimestamp: undefined,
+      exerciseResultIds: exerciseResults.map((er: ExerciseResult) => er.id as string),
+    })
+
+    await this.table(DBTable.WORKOUT_RESULTS).put(workoutResult)
+    await this.table(DBTable.EXERCISE_RESULTS).bulkPut(exerciseResults)
+  }
+
+  async finishWorkout() {
+    // Get active records
+    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+      (w) => w.activated === true
+    )[0]
+    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+      (e) => e.activated === true
+    )
+    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
+      (wr) => wr.activated === true
+    )[0]
+    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
+      (er) => er.activated === true
+    )
+
+    // Deactivate and update records
+    parentWorkout.activated = false
+    parentExercises.forEach((pe: Exercise) => (pe.activated = false))
+    exerciseResults.forEach((er: ExerciseResult) => (er.activated = false))
+    workoutResult.activated = false
+    workoutResult.finishedTimestamp = Date.now()
+
+    await Promise.all([
+      this.putRecord(DBTable.WORKOUTS, parentWorkout),
+      ...parentExercises.map((pe: Exercise) => this.putRecord(DBTable.EXERCISES, pe)),
+      ...exerciseResults.map((er: ExerciseResult) => this.putRecord(DBTable.EXERCISE_RESULTS, er)),
+      this.putRecord(DBTable.WORKOUT_RESULTS, workoutResult),
+    ])
+  }
+
+  async discardWorkout() {
+    // Get active records
+    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+      (w) => w.activated === true
+    )[0]
+    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+      (e) => e.activated === true
+    )
+    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
+      (wr) => wr.activated === true
+    )[0]
+    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
+      (er) => er.activated === true
+    )
+
+    // Deactivate parent records
+    parentWorkout.activated = false
+    parentExercises.forEach((pe: Exercise) => (pe.activated = false))
+
+    await Promise.all([
+      this.putRecord(DBTable.WORKOUTS, parentWorkout),
+      ...parentExercises.map((pe: Exercise) => this.putRecord(DBTable.EXERCISES, pe)),
+    ])
+
+    // Delete child records
+    await Promise.all([
+      ...exerciseResults.map((er: ExerciseResult) =>
+        this.deleteRecord(DBTable.EXERCISE_RESULTS, er.id as string)
+      ),
+      this.deleteRecord(DBTable.WORKOUT_RESULTS, workoutResult.id),
+    ])
   }
 
   /////////////////////////////////////////////////////////////////////////////

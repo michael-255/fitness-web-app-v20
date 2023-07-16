@@ -83,6 +83,8 @@ export enum Icon {
   SAVE = 'save',
   DEFAULTS = 'playlist_add',
   REMOVE_SET = 'backspace',
+  WORKOUT_BEGIN = 'directions_run',
+  WORKOUT_RESUME = 'replay',
 
   // Design Elements
   MENU = 'menu',

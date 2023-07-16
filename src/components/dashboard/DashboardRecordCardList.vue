@@ -2,9 +2,11 @@
 import { Icon } from '@/types/general'
 import { getDisplayDate, getDurationFromMilliseconds, getRecordsCountDisplay } from '@/utils/common'
 import { useTimeAgo } from '@vueuse/core'
-import type { AnyDBRecord, DBTable, ParentTable } from '@/types/database'
+import { DBTable, type AnyDBRecord, type ParentTable } from '@/types/database'
 import DashboardRecordCardMenu from '@/components/dashboard/DashboardRecordCardMenu.vue'
 import useRouting from '@/composables/useRouting'
+import useDialogs from '@/composables/useDialogs'
+import useLogger from '@/composables/useLogger'
 import DB from '@/services/Database'
 
 const props = defineProps<{
@@ -14,11 +16,34 @@ const props = defineProps<{
   defaultsFunc?: () => any
 }>()
 
+const { log } = useLogger()
+const { confirmDialog } = useDialogs()
 const { goToCreate, goToActive } = useRouting()
 
-async function onActivate(table: DBTable, id: string) {
-  await DB.toggleActive(table, id)
-  goToActive()
+async function onBeginWorkout(id: string, name: string) {
+  const isActiveWorkout = await DB.isActiveWorkout()
+
+  if (isActiveWorkout) {
+    confirmDialog(
+      'Replace Active Workout',
+      `You already have an active workout. Do you want to replace it with ${name}?`,
+      Icon.WARN,
+      'warning',
+      async () => {
+        try {
+          await DB.discardWorkout()
+          await DB.beginWorkout(id)
+          goToActive()
+          log.info('Replaced active workout', { replacedById: id, replacedByName: name })
+        } catch (error) {
+          log.error('Failed to replace active workout', error)
+        }
+      }
+    )
+  } else {
+    await DB.beginWorkout(id)
+    goToActive()
+  }
 }
 </script>
 
@@ -164,31 +189,48 @@ async function onActivate(table: DBTable, id: string) {
           </div>
         </QCardSection>
 
-        <QCardActions v-if="record.activated" class="col-auto">
+        <QCardActions v-if="parentTable === DBTable.WORKOUTS" class="col-auto">
           <QBtn
-            label="Go To Active"
+            v-if="record?.activated"
+            label="Resume Workout"
             color="positive"
             class="full-width"
-            :icon="Icon.UP"
+            :icon="Icon.WORKOUT_RESUME"
             @click="goToActive()"
+          />
+
+          <QBtn
+            v-else
+            label="Begin Workout"
+            color="primary"
+            :icon="Icon.WORKOUT_BEGIN"
+            class="full-width"
+            @click="onBeginWorkout(record.id, record.name)"
           />
         </QCardActions>
 
-        <QCardActions v-else class="col-auto">
-          <QBtn
-            :label="`Attach ${DB.getLabel(DB.getChildTable(parentTable), 'singular')}`"
-            color="primary"
-            class="full-width q-mb-sm"
-            :icon="Icon.ATTACH"
-            @click="goToCreate(DB.getChildTable(parentTable), record.id)"
-          />
+        <QCardActions v-if="parentTable === DBTable.EXERCISES" class="col-auto">
+          <div v-if="record?.activated" class="text-center full-width">
+            Access limited while active
+          </div>
 
           <QBtn
-            label="Activate"
+            v-else
+            label="Add Exercise Entry"
             color="primary"
             class="full-width"
-            :icon="Icon.READY"
-            @click="onActivate(parentTable, record.id)"
+            :icon="Icon.ATTACH"
+            @click="goToCreate(DBTable.EXERCISE_RESULTS, record.id)"
+          />
+        </QCardActions>
+
+        <QCardActions v-if="parentTable === DBTable.MEASUREMENTS" class="col-auto">
+          <QBtn
+            label="Take Measurement"
+            color="primary"
+            class="full-width"
+            :icon="Icon.MEASUREMENTS"
+            @click="goToCreate(DBTable.MEASUREMENT_RESULTS, record.id)"
           />
         </QCardActions>
       </QCard>

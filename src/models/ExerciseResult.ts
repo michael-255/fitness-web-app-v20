@@ -5,7 +5,7 @@ import { defineAsyncComponent } from 'vue'
 import { z } from 'zod'
 import { ExerciseInput } from '@/models/Exercise'
 
-export const exerciseDataFields = [
+const exerciseDataFields = [
   DBField.REPS,
   DBField.WEIGHT,
   DBField.DISTANCE,

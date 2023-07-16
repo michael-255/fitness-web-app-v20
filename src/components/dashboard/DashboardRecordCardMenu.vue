@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@/types/general'
-import type { AnyDBRecord, DBTable, ParentTable } from '@/types/database'
+import type { AnyDBRecord, ParentTable } from '@/types/database'
 import useLogger from '@/composables/useLogger'
 import useDialogs from '@/composables/useDialogs'
 import useRouting from '@/composables/useRouting'
@@ -50,18 +50,18 @@ async function onCharts(parentTable: ParentTable, id: string) {
   chartsDialog(id, parentTable)
 }
 
-function onDeactivate(table: DBTable, id: string) {
+function onDiscardWorkout() {
   confirmDialog(
-    'Deactivate Record',
-    'Would you like to deactivate this record?',
+    'Discard Workout',
+    'Would you like to discard the current active workout? You will lose any progress saved so far, but regain access to locked records.',
     Icon.CANCEL,
     'warning',
     async () => {
       try {
-        await DB.toggleActive(table, id)
-        log.info('Deactivated record', { table, id })
+        await DB.discardWorkout()
+        log.info('Discarded active workout')
       } catch (error) {
-        log.error('Deactivation failed', error)
+        log.error('Failed to discard active workout', error)
       }
     }
   )
@@ -85,18 +85,18 @@ function onDeactivate(table: DBTable, id: string) {
       flat
       color="warning"
       :icon="Icon.CANCEL"
-      @click="onDeactivate(parentTable, record.id)"
+      @click="onDiscardWorkout()"
     />
 
-    <span v-else>
-      <QIcon
-        :name="record.favorited ? Icon.FAVORITE_ON : Icon.FAVORITE_OFF"
-        :color="record.favorited ? 'warning' : 'grey'"
-        size="md"
-        class="cursor-pointer"
-        @click="onToggleFavorite(record.id, record.name, record.favorited)"
-      />
-    </span>
+    <QBtn
+      v-else
+      round
+      flat
+      size="md"
+      :color="record.favorited ? 'warning' : 'grey'"
+      :icon="record.favorited ? Icon.FAVORITE_ON : Icon.FAVORITE_OFF"
+      @click="onToggleFavorite(record.id, record.name, record.favorited)"
+    />
 
     <QBtn round flat :icon="Icon.MENU_VERTICAL">
       <QMenu auto-close anchor="top right" transition-show="flip-right" transition-hide="flip-left">
