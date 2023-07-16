@@ -70,17 +70,19 @@ function onDiscardWorkout() {
 
 <template>
   <div class="absolute-top-right q-ma-xs">
-    <QIcon
+    <QBtn
       v-show="record.previousChild?.note"
-      :name="Icon.NOTE"
+      dense
+      round
+      flat
       color="primary"
-      size="md"
-      class="cursor-pointer q-mr-xs"
+      :icon="Icon.NOTE"
       @click="viewPreviousNote(record?.previousChild?.note || '')"
     />
 
     <QBtn
       v-if="record.activated"
+      dense
       round
       flat
       color="warning"
@@ -90,9 +92,9 @@ function onDiscardWorkout() {
 
     <QBtn
       v-else
+      dense
       round
       flat
-      size="md"
       :color="record.favorited ? 'warning' : 'grey'"
       :icon="record.favorited ? Icon.FAVORITE_ON : Icon.FAVORITE_OFF"
       @click="onToggleFavorite(record.id, record.name, record.favorited)"
