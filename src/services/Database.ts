@@ -527,18 +527,18 @@ class Database extends Dexie {
 
   async isActiveWorkout() {
     // Get active records
-    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+    const parentWorkout: Workout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
       (w) => w.activated === true
     )[0]
-    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+    const parentExercises: Exercise[] = (await this.table(DBTable.EXERCISES).toArray()).filter(
       (e) => e.activated === true
     )
-    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
-      (wr) => wr.activated === true
-    )[0]
-    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
-      (er) => er.activated === true
-    )
+    const workoutResult: WorkoutResult = (
+      await this.table(DBTable.WORKOUT_RESULTS).toArray()
+    ).filter((wr) => wr.activated === true)[0]
+    const exerciseResults: ExerciseResult[] = (
+      await this.table(DBTable.EXERCISE_RESULTS).toArray()
+    ).filter((er) => er.activated === true)
 
     return (
       parentWorkout || parentExercises.length > 0 || workoutResult || exerciseResults.length > 0
@@ -547,18 +547,18 @@ class Database extends Dexie {
 
   async getActiveWorkout() {
     // Get active records
-    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+    const parentWorkout: Workout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
       (w) => w.activated === true
-    )[0]
-    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+    )[0] // Should only be one
+    const parentExercises: Exercise[] = (await this.table(DBTable.EXERCISES).toArray()).filter(
       (e) => e.activated === true
     )
-    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
-      (wr) => wr.activated === true
-    )[0]
-    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
-      (er) => er.activated === true
-    )
+    const workoutResult: WorkoutResult = (
+      await this.table(DBTable.WORKOUT_RESULTS).toArray()
+    ).filter((wr) => wr.activated === true)[0] // Should only be one
+    const exerciseResults: ExerciseResult[] = (
+      await this.table(DBTable.EXERCISE_RESULTS).toArray()
+    ).filter((er) => er.activated === true)
 
     return {
       parentWorkout,
@@ -775,18 +775,18 @@ class Database extends Dexie {
 
   async finishWorkout() {
     // Get active records
-    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+    const parentWorkout: Workout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
       (w) => w.activated === true
-    )[0]
-    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+    )[0] // Should only be one
+    const parentExercises: Exercise[] = (await this.table(DBTable.EXERCISES).toArray()).filter(
       (e) => e.activated === true
     )
-    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
-      (wr) => wr.activated === true
-    )[0]
-    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
-      (er) => er.activated === true
-    )
+    const workoutResult: WorkoutResult = (
+      await this.table(DBTable.WORKOUT_RESULTS).toArray()
+    ).filter((wr) => wr.activated === true)[0] // Should only be one
+    const exerciseResults: ExerciseResult[] = (
+      await this.table(DBTable.EXERCISE_RESULTS).toArray()
+    ).filter((er) => er.activated === true)
 
     // Deactivate and update records
     parentWorkout.activated = false
@@ -805,18 +805,18 @@ class Database extends Dexie {
 
   async discardWorkout() {
     // Get active records
-    const parentWorkout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
+    const parentWorkout: Workout = (await this.table(DBTable.WORKOUTS).toArray()).filter(
       (w) => w.activated === true
-    )[0]
-    const parentExercises = (await this.table(DBTable.EXERCISES).toArray()).filter(
+    )[0] // Should only be one
+    const parentExercises: Exercise[] = (await this.table(DBTable.EXERCISES).toArray()).filter(
       (e) => e.activated === true
     )
-    const workoutResult = (await this.table(DBTable.WORKOUT_RESULTS).toArray()).filter(
-      (wr) => wr.activated === true
-    )[0]
-    const exerciseResults = (await this.table(DBTable.EXERCISE_RESULTS).toArray()).filter(
-      (er) => er.activated === true
-    )
+    const workoutResult: WorkoutResult = (
+      await this.table(DBTable.WORKOUT_RESULTS).toArray()
+    ).filter((wr) => wr.activated === true)[0] // Should only be one
+    const exerciseResults: ExerciseResult[] = (
+      await this.table(DBTable.EXERCISE_RESULTS).toArray()
+    ).filter((er) => er.activated === true)
 
     // Deactivate parent records
     parentWorkout.activated = false
@@ -832,7 +832,7 @@ class Database extends Dexie {
       ...exerciseResults.map((er: ExerciseResult) =>
         this.deleteRecord(DBTable.EXERCISE_RESULTS, er.id as string)
       ),
-      this.deleteRecord(DBTable.WORKOUT_RESULTS, workoutResult.id),
+      this.deleteRecord(DBTable.WORKOUT_RESULTS, workoutResult.id as string),
     ])
   }
 

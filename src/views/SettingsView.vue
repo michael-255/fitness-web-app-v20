@@ -176,7 +176,7 @@ async function onChangeLogRetention(logDurationIndex: number) {
   }
 }
 
-async function onResetSettings() {
+function onResetSettings() {
   confirmDialog(
     'Reset Settings',
     'Would you like to reset your app Settings to the defaults? This does not impact your data.',
@@ -193,7 +193,7 @@ async function onResetSettings() {
   )
 }
 
-async function onDeleteLogs() {
+function onDeleteLogs() {
   confirmDialog(
     `Delete Logs`,
     `Permanetly delete all Logs from the database?`,
@@ -210,7 +210,7 @@ async function onDeleteLogs() {
   )
 }
 
-async function onDeleteAll() {
+function onDeleteAll() {
   confirmDialog(
     'Delete All',
     'Permanetly delete all data from the database?',
@@ -227,7 +227,7 @@ async function onDeleteAll() {
   )
 }
 
-async function onDeleteDatabase() {
+function onDeleteDatabase() {
   confirmDialog(
     'Delete Database',
     'Delete the underlining database? All data will be lost. You must reload the website after this action to reinitialize the database.',

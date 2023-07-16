@@ -13,7 +13,7 @@ const router = createRouter({
       component: () => import('../views/DashboardView.vue'),
     },
     {
-      path: '/active',
+      path: '/active-workout',
       name: RouteName.ACTIVE,
       meta: { layout: 'ActiveLayout' },
       component: () => import('../views/ActiveView.vue'),

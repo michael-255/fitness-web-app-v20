@@ -2,7 +2,8 @@
 import { Icon } from '@/types/general'
 import { AppName } from '@/constants/global'
 import { useMeta } from 'quasar'
-import { ref } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
+import type { AnyDBRecord } from '@/types/database'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import useLogger from '@/composables/useLogger'
 import useDialogs from '@/composables/useDialogs'
@@ -16,6 +17,12 @@ const { confirmDialog } = useDialogs()
 const { goToDashboard } = useRouting()
 
 const isFormValid = ref(true)
+const activeRecords: Ref<Record<string, AnyDBRecord | AnyDBRecord[]>> = ref({})
+
+onMounted(async () => {
+  activeRecords.value = await DB.getActiveWorkout()
+  log.info('Active Workout', { ...activeRecords.value })
+})
 
 async function onSubmit() {
   confirmDialog(
@@ -42,6 +49,9 @@ async function onSubmit() {
       @validation-error="isFormValid = false"
       @validation-success="isFormValid = true"
     >
+      <!-- Workout -->
+      <div>TEST</div>
+
       <!-- Submit -->
       <div class="row justify-center q-my-sm">
         <QBtn label="Finish Workout" type="submit" color="positive" :icon="Icon.SAVE" />

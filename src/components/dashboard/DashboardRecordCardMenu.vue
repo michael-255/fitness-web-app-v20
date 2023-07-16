@@ -17,11 +17,11 @@ const { log } = useLogger()
 const { goToEdit } = useRouting()
 const { confirmDialog, dismissDialog, inspectDialog, chartsDialog } = useDialogs()
 
-async function viewPreviousNote(note: string) {
+function viewPreviousNote(note: string) {
   dismissDialog('Previous Note', note, Icon.NOTE)
 }
 
-async function onToggleFavorite(id: string, name: string, current: boolean) {
+function onToggleFavorite(id: string, name: string, current: boolean) {
   const action = current ? 'Unfavorite' : 'Favorite'
   const message = `Do you want to ${action.toLocaleLowerCase()} ${name}?`
   const icon = current ? Icon.FAVORITE_OFF : Icon.FAVORITE_ON
@@ -46,7 +46,7 @@ async function onInspect(id: string) {
   }
 }
 
-async function onCharts(parentTable: ParentTable, id: string) {
+function onCharts(parentTable: ParentTable, id: string) {
   chartsDialog(id, parentTable)
 }
 

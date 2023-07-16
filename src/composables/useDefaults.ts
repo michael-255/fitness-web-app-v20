@@ -11,7 +11,7 @@ export default function useDefaults() {
   const { log } = useLogger()
   const { confirmDialog } = useDialogs()
 
-  async function onAddBarbellStrengthWorkouts() {
+  function onAddBarbellStrengthWorkouts() {
     confirmDialog(
       'Add Barbell Strength Workouts',
       `Would you like to add the Barbell Strength workouts into the database?`,
@@ -119,10 +119,7 @@ export default function useDefaults() {
     )
   }
 
-  /**
-   * On confirmation, add the stretch routine into the database.
-   */
-  async function onAddStretchRoutine() {
+  function onAddStretchRoutine() {
     confirmDialog(
       'Add Stretch Routine',
       `Would you like to add the Stretch Routine into the database?`,
@@ -263,10 +260,7 @@ export default function useDefaults() {
     )
   }
 
-  /**
-   * On confirmation, add the carpal tunnel routine into the database.
-   */
-  async function onAddCarpalTunnelRoutine() {
+  function onAddCarpalTunnelRoutine() {
     confirmDialog(
       'Add Carpal Tunnel Routine',
       `Would you like to add the Carpal Tunnel Routine into the database?`,
@@ -374,10 +368,7 @@ export default function useDefaults() {
     )
   }
 
-  /**
-   * On confirmation, adds the deep breathing routine into the database.
-   */
-  async function onAddDeepBreathingRoutine() {
+  function onAddDeepBreathingRoutine() {
     confirmDialog(
       'Add Deep Breathing Routine',
       `Would you like to add the Deep Breathing Routine into the database?`,
@@ -452,10 +443,7 @@ export default function useDefaults() {
     )
   }
 
-  /**
-   * On confirmation, add standard measurements into the database.
-   */
-  async function onAddStandardMeasurements() {
+  function onAddStandardMeasurements() {
     confirmDialog(
       'Add Standard Measurements',
       `Would you like to add Standard Measurements into the database?`,
