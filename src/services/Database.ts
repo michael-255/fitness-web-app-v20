@@ -593,6 +593,17 @@ class Database extends Dexie {
     )
   }
 
+  async getPreviousExerciseResults(parentExerciseId: string) {
+    return (
+      await this.table(DBTable.EXERCISE_RESULTS)
+        .where(DBField.PARENT_ID)
+        .equals(parentExerciseId)
+        .sortBy(DBField.CREATED_TIMESTAMP)
+    )
+      .filter((i) => i.activated !== true)
+      .reverse()
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   //                                                                         //
   //     Creates                                                             //

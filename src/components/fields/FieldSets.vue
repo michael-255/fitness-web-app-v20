@@ -116,7 +116,7 @@ function getHint(field: DBField, index: number) {
       <div v-if="parentMultipleSets" class="column reverse">
         <div>
           <QBtn
-            :disable="setTracker.length < Limit.MAX_SETS"
+            :disable="setTracker.length >= Limit.MAX_SETS"
             color="positive"
             class="q-ml-sm"
             round

@@ -83,7 +83,7 @@ async function updateWorkoutNote() {
       @validation-success="isFormValid = true"
     >
       <!-- Workout Description -->
-      <QCard class="q-mt-sm q-mb-md">
+      <QCard v-if="parentWorkout.desc" class="q-mt-sm q-mb-md">
         <QCardSection>
           <p class="text-h6">Workout Description</p>
 

@@ -105,11 +105,6 @@ async function onBeginWorkout(id: string, name: string) {
             <span class="text-caption q-ml-xs"> {{ record.previousChild.bodyWeight }} lbs </span>
           </div>
 
-          <div v-if="record?.previousChild?.bodyWeight">
-            <QIcon :name="Icon.MEASUREMENTS" />
-            <span class="text-caption q-ml-xs"> {{ record.previousChild.bodyWeight }} lbs </span>
-          </div>
-
           <div v-if="record?.previousChild?.percent">
             <QIcon :name="Icon.MEASUREMENTS" />
             <span class="text-caption q-ml-xs"> {{ record.previousChild.percent }}% </span>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { extend } from 'quasar'
 import { onMounted, ref, type Ref } from 'vue'
-import { DBTable, type AnyDBRecord, type DBField } from '@/types/database'
+import { DBTable, type AnyDBRecord, DBField } from '@/types/database'
 import { ExerciseInput, type Exercise } from '@/models/Exercise'
 import type { ExerciseResult } from '@/models/ExerciseResult'
 import { numberSchema } from '@/models/MeasurementResult'
@@ -21,9 +21,16 @@ const { confirmDialog, dismissDialog } = useDialogs()
 
 const parentExercise: Ref<AnyDBRecord> = ref(props.parentExercise)
 const exerciseResult: Ref<AnyDBRecord> = ref(props.exerciseResult)
+const previousExerciseResults: Ref<AnyDBRecord[]> = ref([])
 const setTracker: Ref<null[]> = ref([])
 
-onMounted(() => {
+onMounted(async () => {
+  previousExerciseResults.value = await DB.getPreviousExerciseResults(
+    props.parentExercise.id as string
+  )
+
+  console.log('previousExerciseResults', previousExerciseResults.value)
+
   const exerciseInputs: ExerciseInput[] = props.parentExercise.exerciseInputs || []
 
   exerciseInputs.forEach((input) => {
@@ -88,9 +95,44 @@ async function updateNote() {
   return await updateExerciseResult()
 }
 
-function getHint(field: DBField, index: number) {
-  const previous = parentExercise.value?.previousChild
-  return previous?.[field]?.[index] ? `${previous[field][index]}` : 'No previous value'
+function getHint(field: DBField, setIndex: number) {
+  if (field === DBField.WEIGHT) {
+    return getWeightHint(setIndex)
+  } else {
+    const previous = parentExercise.value?.previousChild
+    return previous?.[field]?.[setIndex] ? `${previous[field][setIndex]}` : 'No previous value'
+  }
+}
+
+function getWeightHint(setIndex: number) {
+  const previousResults = previousExerciseResults.value
+  const lookbackLimit = previousResults.length > 6 ? 6 : previousResults.length
+
+  let firstStr = 'No previous value'
+  let incrementStr = ''
+
+  // Produces the weight increments for the last 5 sets
+  for (let i = 0; i < lookbackLimit; i++) {
+    const currentWeight = previousResults[i]?.weightLbs?.[setIndex]
+
+    if (currentWeight) {
+      if (i === 0) {
+        firstStr = `${currentWeight}`
+      } else {
+        incrementStr += `${previousResults[i - 1]?.weightLbs?.[setIndex] - currentWeight}`
+
+        if (i < lookbackLimit - 1) {
+          incrementStr += ', '
+        }
+      }
+    }
+  }
+
+  if (incrementStr.endsWith(', ')) {
+    incrementStr = incrementStr.slice(0, -2)
+  }
+
+  return incrementStr ? `${firstStr} ← ${incrementStr}` : firstStr
 }
 
 function viewPreviousExerciseNote(note: string) {
