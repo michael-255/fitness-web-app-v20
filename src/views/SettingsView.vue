@@ -77,78 +77,86 @@ function onRejectedFile(entries: any) {
   log.warn(`Cannot import"${fileName}`, entries)
 }
 
-function onImportFile() {
-  confirmDialog(
-    'Import',
-    `Import backup data from ${importFile?.value?.name} and attempt to load records into the database from it? Please note that Logs are NOT imported.`,
-    Icon.INFO,
-    'info',
-    async () => {
-      try {
-        const backupData = JSON.parse(await importFile.value.text()) as BackupData
+async function onImportFile() {
+  const isActiveWorkout = await DB.isActiveWorkout()
 
-        log.silentDebug('backupData:', backupData)
+  const message = isActiveWorkout
+    ? `You have an active workout. Importing data will discard it. Import backup data from ${importFile?.value?.name} and attempt to load records into the database from it?`
+    : `Import backup data from ${importFile?.value?.name} and attempt to load records into the database from it?`
+  const icon = isActiveWorkout ? Icon.WARN : Icon.INFO
+  const color = isActiveWorkout ? 'warning' : 'info'
 
-        if (backupData.appName !== AppName) {
-          throw new Error(`Cannot import data from the app ${backupData.appName}`)
-        }
+  confirmDialog('Import', message, icon, color, async () => {
+    try {
+      await DB.discardWorkout()
 
-        // Import settings first in case errors stop type importing below
-        if (backupData[InternalTable.SETTINGS].length > 0) {
-          await Promise.all(
-            backupData[InternalTable.SETTINGS]
-              .filter((setting) => Object.values(SettingKey).includes(setting.key))
-              .map(async (setting) => await DB.setSetting(setting.key, setting.value))
-          )
-        }
+      const backupData = JSON.parse(await importFile.value.text()) as BackupData
 
-        // Logs are never imported
-        await Promise.all([
-          Object.values(DBTable).map(
-            async (table) => await DB.importRecords(table, backupData[table])
-          ),
-        ])
+      log.silentDebug('backupData:', backupData)
 
-        importFile.value = null // Clear input
-        log.info('Successfully imported available data')
-      } catch (error) {
-        log.error('Error during import', error)
+      if (backupData.appName !== AppName) {
+        throw new Error(`Cannot import data from the app ${backupData.appName}`)
       }
+
+      // Import settings first in case errors stop type importing below
+      if (backupData[InternalTable.SETTINGS].length > 0) {
+        await Promise.all(
+          backupData[InternalTable.SETTINGS]
+            .filter((setting) => Object.values(SettingKey).includes(setting.key))
+            .map(async (setting) => await DB.setSetting(setting.key, setting.value))
+        )
+      }
+
+      // Logs are never imported
+      await Promise.all([
+        Object.values(DBTable).map(
+          async (table) => await DB.importRecords(table, backupData[table])
+        ),
+      ])
+
+      importFile.value = null // Clear input
+      log.info('Successfully imported available data')
+    } catch (error) {
+      log.error('Error during import', error)
     }
-  )
+  })
 }
 
-function onExportRecords() {
+async function onExportRecords() {
   const appNameSlug = AppName.toLowerCase().split(' ').join('-')
   const date = new Date().toISOString().split('T')[0]
   const filename = `export-${appNameSlug}-${date}.json`
 
-  confirmDialog(
-    'Export',
-    `Export all data into the file "${filename}" as a backup?`,
-    Icon.INFO,
-    'info',
-    async () => {
-      try {
-        const backupData = await DB.getBackupData()
+  const isActiveWorkout = await DB.isActiveWorkout()
 
-        log.silentDebug('backupData:', backupData)
+  const message = isActiveWorkout
+    ? `You have an active workout. Exporting data will discard it. Export all data into the file "${filename}" as a backup?`
+    : `Export all data into the file "${filename}" as a backup?`
+  const icon = isActiveWorkout ? Icon.WARN : Icon.INFO
+  const color = isActiveWorkout ? 'warning' : 'info'
 
-        const fileStatus = exportFile(filename, JSON.stringify(backupData), {
-          encoding: 'UTF-8',
-          mimeType: 'application/json',
-        })
+  confirmDialog('Export', message, icon, color, async () => {
+    try {
+      await DB.discardWorkout()
 
-        if (fileStatus === true) {
-          log.info('File downloaded successfully', { filename })
-        } else {
-          throw new Error('Browser denied file download')
-        }
-      } catch (error) {
-        log.error('Export failed', error)
+      const backupData = await DB.getBackupData()
+
+      log.silentDebug('backupData:', backupData)
+
+      const fileStatus = exportFile(filename, JSON.stringify(backupData), {
+        encoding: 'UTF-8',
+        mimeType: 'application/json',
+      })
+
+      if (fileStatus === true) {
+        log.info('File downloaded successfully', { filename })
+      } else {
+        throw new Error('Browser denied file download')
       }
+    } catch (error) {
+      log.error('Export failed', error)
     }
-  )
+  })
 }
 
 async function onChangeLogRetention(logDurationIndex: number) {
@@ -361,7 +369,7 @@ async function updateHeight() {
       <div class="q-mb-md">
         <p>
           Import data into the database from a JSON file. The app expects the data in the file to be
-          structured the same as the exported version.
+          structured the same as the exported version. Logs are ignored during imports.
         </p>
         <QFile
           v-model="importFile"
