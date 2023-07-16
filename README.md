@@ -4,7 +4,7 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
-- WIP
+- [ ] Start working on `Active Workout`
 
 ## Table of Contents
 

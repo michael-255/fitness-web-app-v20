@@ -93,9 +93,21 @@ export enum Icon {
   READY = 'recommend',
   LOCK = 'lock',
   PREVIOUS = 'undo',
+  CALENDAR_CLEAR = 'event_busy',
   CALENDAR_CHECK = 'event_available',
   CALENDAR_DATE = 'event',
   OPTIONS = 'tune',
   CLOCK = 'access_time',
   EMPTY = 'check_box_outline_blank',
+
+  // Exercise Data
+  REPS = 'tag',
+  WEIGHT = 'fitness_center',
+  DISTANCE = 'pin_drop',
+  DURATION = 'schedule',
+  WATTS = 'bolt',
+  SPEED = 'speed',
+  RESISTANCE = 'width_normal',
+  INCLINE = 'show_chart',
+  CALORIES = 'local_fire_department',
 }

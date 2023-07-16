@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@/types/general'
-import { getDisplayDate, getRecordsCountDisplay } from '@/utils/common'
+import { getDisplayDate, getDurationFromMilliseconds, getRecordsCountDisplay } from '@/utils/common'
 import { useTimeAgo } from '@vueuse/core'
 import type { AnyDBRecord, DBTable, ParentTable } from '@/types/database'
 import DashboardRecordCardMenu from '@/components/dashboard/DashboardRecordCardMenu.vue'
@@ -11,7 +11,7 @@ const props = defineProps<{
   parentTable: ParentTable
   records: AnyDBRecord[]
   showDescriptions: boolean
-  defaultsFunc?: () => Promise<void>
+  defaultsFunc?: () => any
 }>()
 
 const { goToCreate, goToActive } = useRouting()
@@ -57,6 +57,109 @@ async function onActivate(table: DBTable, id: string) {
             <QIcon :name="Icon.CALENDAR_CHECK" />
             <span class="text-caption q-ml-xs">
               {{ getDisplayDate(record.previousChild.createdTimestamp) }}
+            </span>
+          </div>
+
+          <div
+            v-if="
+              record.previousChild?.createdTimestamp && record?.previousChild?.finishedTimestamp
+            "
+          >
+            <QIcon :name="Icon.STOPWATCH" />
+            <span class="text-caption q-ml-xs">
+              {{
+                getDurationFromMilliseconds(
+                  record.previousChild.finishedTimestamp - record.previousChild.createdTimestamp
+                )
+              }}
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.bodyWeight">
+            <QIcon :name="Icon.MEASUREMENTS" />
+            <span class="text-caption q-ml-xs"> {{ record.previousChild.bodyWeight }} lbs </span>
+          </div>
+
+          <div v-if="record?.previousChild?.bodyWeight">
+            <QIcon :name="Icon.MEASUREMENTS" />
+            <span class="text-caption q-ml-xs"> {{ record.previousChild.bodyWeight }} lbs </span>
+          </div>
+
+          <div v-if="record?.previousChild?.percent">
+            <QIcon :name="Icon.MEASUREMENTS" />
+            <span class="text-caption q-ml-xs"> {{ record.previousChild.percent }}% </span>
+          </div>
+
+          <div v-if="record?.previousChild?.inches">
+            <QIcon :name="Icon.MEASUREMENTS" />
+            <span class="text-caption q-ml-xs"> {{ record.previousChild.inches }} inches </span>
+          </div>
+
+          <div v-if="record?.previousChild?.number">
+            <QIcon :name="Icon.MEASUREMENTS" />
+            <span class="text-caption q-ml-xs">{{ record.previousChild.number }}</span>
+          </div>
+
+          <div v-if="record?.previousChild?.reps?.[0]">
+            <QIcon :name="Icon.REPS" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.reps.join(', ') }} reps
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.weightLbs?.[0]">
+            <QIcon :name="Icon.WEIGHT" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.weightLbs.join(', ') }} lbs
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.distanceMiles?.[0]">
+            <QIcon :name="Icon.DISTANCE" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.distanceMiles.join(', ') }} mi
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.durationMinutes?.[0]">
+            <QIcon :name="Icon.DURATION" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.durationMinutes.join(', ') }} minutes
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.watts?.[0]">
+            <QIcon :name="Icon.WATTS" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.watts.join(', ') }} watts
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.speedMph?.[0]">
+            <QIcon :name="Icon.SPEED" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.speedMph.join(', ') }} mph
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.resistance?.[0]">
+            <QIcon :name="Icon.RESISTANCE" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.resistance.join(', ') }} resistance
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.incline?.[0]">
+            <QIcon :name="Icon.INCLINE" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.incline.join(', ') }} incline
+            </span>
+          </div>
+
+          <div v-if="record?.previousChild?.calories?.[0]">
+            <QIcon :name="Icon.CALORIES" />
+            <span class="text-caption q-ml-xs">
+              {{ record.previousChild.calories.join(', ') }} calories
             </span>
           </div>
         </QCardSection>

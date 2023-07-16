@@ -42,8 +42,10 @@ export class WorkoutResult extends Child {
   static getFieldComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
       defineAsyncComponent(() => import('@/components/fields/FieldParentId.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldExerciseResultIds.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldNote.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldFinishedTimestamp.vue')),
     ]
   }
 

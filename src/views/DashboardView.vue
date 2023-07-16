@@ -13,14 +13,22 @@ import WelcomeOverlay from '@/components/WelcomeOverlay.vue'
 import useUIStore from '@/stores/ui'
 import useLogger from '@/composables/useLogger'
 import DashboardRecordCardList from '@/components/dashboard/DashboardRecordCardList.vue'
-// import useDefaults from '@/composables/useDefaults'
+import useDefaults from '@/composables/useDefaults'
+import useDialogs from '@/composables/useDialogs'
 import DB from '@/services/Database'
 
 useMeta({ title: `${AppName} - Dashboard` })
 
 const uiStore = useUIStore()
 const { log } = useLogger()
-// const { } = useDefaults()
+const { confirmDialog } = useDialogs()
+const {
+  onAddBarbellStrengthWorkouts,
+  onAddStretchRoutine,
+  onAddCarpalTunnelRoutine,
+  onAddDeepBreathingRoutine,
+  onAddStandardMeasurements,
+} = useDefaults()
 
 const dashboardOptions = [
   {
@@ -68,6 +76,25 @@ onUnmounted(() => {
   exercisesSubscription.unsubscribe()
   measurementsSubscription.unsubscribe()
 })
+
+function onDefaultWorkouts() {
+  confirmDialog(
+    'Load Default Workouts',
+    'Cycle through, and confirm each default workout you would like to load into the database.',
+    Icon.DEFAULTS,
+    'info',
+    async () => {
+      try {
+        await onAddBarbellStrengthWorkouts()
+        await onAddStretchRoutine()
+        await onAddCarpalTunnelRoutine()
+        await onAddDeepBreathingRoutine()
+      } catch (error) {
+        log.error('Defaults failed', error)
+      }
+    }
+  )
+}
 </script>
 
 <template>
@@ -99,7 +126,7 @@ onUnmounted(() => {
         :parentTable="DBTable.WORKOUTS"
         :records="workouts"
         :showDescriptions="showDescriptions"
-        :defaultsFunc="undefined"
+        :defaultsFunc="onDefaultWorkouts"
       />
       <DashboardRecordCardList
         v-show="uiStore.dashboardSelection === DBTable.EXERCISES"
@@ -113,7 +140,7 @@ onUnmounted(() => {
         :parentTable="DBTable.MEASUREMENTS"
         :records="measurements"
         :showDescriptions="showDescriptions"
-        :defaultsFunc="undefined"
+        :defaultsFunc="onAddStandardMeasurements"
       />
     </section>
   </ResponsivePage>

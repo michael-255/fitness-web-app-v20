@@ -40,6 +40,7 @@ export class Workout extends Parent {
     return [
       defineAsyncComponent(() => import('@/components/fields/FieldName.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldDesc.vue')),
+      defineAsyncComponent(() => import('@/components/fields/FieldExerciseIds.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldCreatedTimestamp.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldEnabled.vue')),
       defineAsyncComponent(() => import('@/components/fields/FieldFavorited.vue')),

@@ -500,6 +500,31 @@ class Database extends Dexie {
     }))
   }
 
+  async getExerciseIdOptions(): Promise<{ value: string; label: string; disable: boolean }[]> {
+    const records = await this.table(DBTable.EXERCISES).orderBy(DBField.NAME).toArray()
+
+    return records.map((r: AnyDBRecord) => ({
+      value: r.id,
+      label: `${r.name} (${truncateString(r.id, 8, '*')})`,
+      disable: r.activated,
+    }))
+  }
+
+  async getExerciseResultIdOptions(): Promise<
+    { value: string; label: string; disable: boolean }[]
+  > {
+    const records = await this.table(DBTable.EXERCISE_RESULTS)
+      .orderBy(DBField.CREATED_TIMESTAMP)
+      .reverse()
+      .toArray()
+
+    return records.map((r: AnyDBRecord) => ({
+      value: r.id,
+      label: `${r.name} (${truncateString(r.id, 8, '*')})`,
+      disable: r.activated,
+    }))
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   //                                                                         //
   //     Creates                                                             //
