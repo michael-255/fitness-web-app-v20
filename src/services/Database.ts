@@ -547,7 +547,7 @@ class Database extends Dexie {
       (e) => e.activated === true
     )
 
-    const exerciseIds = parentWorkout.exerciseIds ?? []
+    const exerciseIds = parentWorkout?.exerciseIds ?? []
 
     // Sort the parent exercises
     if (exerciseIds) {
@@ -565,7 +565,7 @@ class Database extends Dexie {
       await this.table(DBTable.EXERCISE_RESULTS).toArray()
     ).filter((er) => er.activated === true)
 
-    const exerciseResultIds = workoutResult.exerciseResultIds ?? []
+    const exerciseResultIds = workoutResult?.exerciseResultIds ?? []
 
     // Sort the exercise results
     if (exerciseResultIds) {
@@ -772,15 +772,33 @@ class Database extends Dexie {
         activated: true,
         parentId: pe.id,
         note: '',
-        reps: pe.exerciseInputs?.includes(ExerciseInput.REPS) ? [] : undefined,
-        weightLbs: pe.exerciseInputs?.includes(ExerciseInput.WEIGHT) ? [] : undefined,
-        distanceMiles: pe.exerciseInputs?.includes(ExerciseInput.DISTANCE) ? [] : undefined,
-        durationMinutes: pe.exerciseInputs?.includes(ExerciseInput.DURATION) ? [] : undefined,
-        watts: pe.exerciseInputs?.includes(ExerciseInput.WATTS) ? [] : undefined,
-        speedMph: pe.exerciseInputs?.includes(ExerciseInput.SPEED) ? [] : undefined,
-        resistance: pe.exerciseInputs?.includes(ExerciseInput.RESISTANCE) ? [] : undefined,
-        incline: pe.exerciseInputs?.includes(ExerciseInput.INCLINE) ? [] : undefined,
-        calories: pe.exerciseInputs?.includes(ExerciseInput.CALORIES) ? [] : undefined,
+        reps: pe.exerciseInputs?.includes(ExerciseInput.REPS)
+          ? ([null] as unknown as number[])
+          : undefined,
+        weightLbs: pe.exerciseInputs?.includes(ExerciseInput.WEIGHT)
+          ? ([null] as unknown as number[])
+          : undefined,
+        distanceMiles: pe.exerciseInputs?.includes(ExerciseInput.DISTANCE)
+          ? ([null] as unknown as number[])
+          : undefined,
+        durationMinutes: pe.exerciseInputs?.includes(ExerciseInput.DURATION)
+          ? ([null] as unknown as number[])
+          : undefined,
+        watts: pe.exerciseInputs?.includes(ExerciseInput.WATTS)
+          ? ([null] as unknown as number[])
+          : undefined,
+        speedMph: pe.exerciseInputs?.includes(ExerciseInput.SPEED)
+          ? ([null] as unknown as number[])
+          : undefined,
+        resistance: pe.exerciseInputs?.includes(ExerciseInput.RESISTANCE)
+          ? ([null] as unknown as number[])
+          : undefined,
+        incline: pe.exerciseInputs?.includes(ExerciseInput.INCLINE)
+          ? ([null] as unknown as number[])
+          : undefined,
+        calories: pe.exerciseInputs?.includes(ExerciseInput.CALORIES)
+          ? ([null] as unknown as number[])
+          : undefined,
       })
     })
 
@@ -837,6 +855,13 @@ class Database extends Dexie {
       ),
       this.deleteRecord(DBTable.WORKOUT_RESULTS, workoutResult.id as string),
     ])
+  }
+
+  /**
+   * This ignores schema parsing until you try to finish the active workout.
+   */
+  async putActiveRecord(childTable: ChildTable, activeRecord: AnyDBRecord) {
+    return await this.table(childTable).put(activeRecord)
   }
 
   /////////////////////////////////////////////////////////////////////////////

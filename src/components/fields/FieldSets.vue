@@ -30,7 +30,7 @@ useParentIdWatcher((parentRecord: AnyDBRecord) => {
   if (route.name === RouteName.CREATE) {
     Object.values(ExerciseInput).forEach((input) => {
       if (parentExerciseInputs.value.includes(input)) {
-        actionStore.record[DB.getFieldForInput(input)] = [undefined]
+        actionStore.record[DB.getFieldForInput(input)] = [null]
       } else {
         delete actionStore.record[DB.getFieldForInput(input)]
       }
@@ -60,7 +60,7 @@ function addSet() {
   if (setTracker.value.length > 0 && setTracker.value.length < Limit.MAX_SETS) {
     parentExerciseInputs.value.forEach((input) => {
       if (Object.values(ExerciseInput).includes(input)) {
-        actionStore.record[DB.getFieldForInput(input)].push(undefined)
+        actionStore.record[DB.getFieldForInput(input)].push(null)
         updateSetTracker(actionStore.record[DB.getFieldForInput(input)])
       }
     })
@@ -115,8 +115,22 @@ function getHint(field: DBField, index: number) {
 
       <div v-if="parentMultipleSets" class="column reverse">
         <div>
-          <QBtn color="positive" class="q-ml-sm" round :icon="Icon.ADD" @click="addSet()" />
-          <QBtn color="negative" class="q-ml-sm" round :icon="Icon.REMOVE" @click="removeSet()" />
+          <QBtn
+            :disable="setTracker.length < Limit.MAX_SETS"
+            color="positive"
+            class="q-ml-sm"
+            round
+            :icon="Icon.ADD"
+            @click="addSet()"
+          />
+          <QBtn
+            :disable="setTracker.length <= 1"
+            color="negative"
+            class="q-ml-sm"
+            round
+            :icon="Icon.REMOVE"
+            @click="removeSet()"
+          />
         </div>
       </div>
     </div>

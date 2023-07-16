@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { Icon } from '@/types/general'
+import { Icon, Limit } from '@/types/general'
 import { AppName } from '@/constants/global'
-import { useMeta } from 'quasar'
+import { extend, useMeta } from 'quasar'
 import { onUnmounted, ref, type Ref } from 'vue'
 import type { Workout } from '@/models/Workout'
 import type { Exercise } from '@/models/Exercise'
 import type { WorkoutResult } from '@/models/WorkoutResult'
 import type { ExerciseResult } from '@/models/ExerciseResult'
+import { textAreaSchema } from '@/models/_Parent'
+import { DBTable } from '@/types/database'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import ActiveExerciseCard from '@/components/active-workout/ActiveExerciseCard.vue'
 import useLogger from '@/composables/useLogger'
@@ -66,6 +68,11 @@ function getExerciseParent(parentExerciseId: string) {
 function viewPreviousWorkoutNote(note: string) {
   dismissDialog('Previous Workout Note', note, Icon.NOTE)
 }
+
+async function updateWorkoutNote() {
+  workoutResult.value.note = workoutResult.value.note?.trim()
+  return await DB.putActiveRecord(DBTable.WORKOUT_RESULTS, extend(true, {}, workoutResult.value))
+}
 </script>
 
 <template>
@@ -103,6 +110,41 @@ function viewPreviousWorkoutNote(note: string) {
         :exerciseResult="er"
         class="q-mb-md"
       />
+
+      <!-- Workout Note -->
+      <QCard class="q-mt-sm q-mb-md">
+        <QCardSection>
+          <p class="text-h6">Workout Notes</p>
+
+          <QInput
+            :label="`${parentWorkout.name} notes`"
+            v-model="workoutResult.note"
+            :rules="[(val: string) => textAreaSchema.safeParse(val).success || `Note cannot exceed ${Limit.MAX_TEXT_AREA} characters`]"
+            :maxlength="Limit.MAX_TEXT_AREA"
+            type="textarea"
+            lazy-rules
+            autogrow
+            counter
+            dense
+            outlined
+            color="primary"
+            @blur="updateWorkoutNote()"
+          >
+            <template v-slot:prepend>
+              <QIcon :name="Icon.NOTE" />
+            </template>
+
+            <template v-slot:append>
+              <QIcon
+                v-if="workoutResult.note !== ''"
+                :name="Icon.CANCEL"
+                @click="workoutResult.note = ''"
+                class="cursor-pointer"
+              />
+            </template>
+          </QInput>
+        </QCardSection>
+      </QCard>
 
       <!-- Submit -->
       <div class="row justify-center q-my-sm">
