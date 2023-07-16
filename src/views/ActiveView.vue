@@ -17,7 +17,7 @@ import DB from '@/services/Database'
 useMeta({ title: `${AppName} - Active Workout` })
 
 const { log } = useLogger()
-const { confirmDialog } = useDialogs()
+const { confirmDialog, dismissDialog } = useDialogs()
 const { goToDashboard } = useRouting()
 
 const isFormValid = ref(true)
@@ -62,6 +62,10 @@ async function onSubmit() {
 function getExerciseParent(parentExerciseId: string) {
   return (parentExercises.value.find((e) => e.id === parentExerciseId) || {}) as Exercise
 }
+
+function viewPreviousWorkoutNote(note: string) {
+  dismissDialog('Previous Workout Note', note, Icon.NOTE)
+}
 </script>
 
 <template>
@@ -71,6 +75,26 @@ function getExerciseParent(parentExerciseId: string) {
       @validation-error="isFormValid = false"
       @validation-success="isFormValid = true"
     >
+      <!-- Workout Description -->
+      <QCard class="q-mt-sm q-mb-md">
+        <QCardSection>
+          <p class="text-h6">Workout Description</p>
+
+          <div>{{ parentWorkout.desc }}</div>
+
+          <div class="absolute-top-right q-ma-xs">
+            <QBtn
+              v-if="parentWorkout?.previousChild?.note"
+              flat
+              round
+              :icon="Icon.NOTE"
+              color="info"
+              @click="viewPreviousWorkoutNote(parentWorkout.previousChild.note)"
+            />
+          </div>
+        </QCardSection>
+      </QCard>
+
       <!-- Workout Exercises -->
       <ActiveExerciseCard
         v-for="er in exerciseResults"

@@ -546,12 +546,35 @@ class Database extends Dexie {
     const parentExercises: Exercise[] = (await this.table(DBTable.EXERCISES).toArray()).filter(
       (e) => e.activated === true
     )
+
+    const exerciseIds = parentWorkout.exerciseIds ?? []
+
+    // Sort the parent exercises
+    if (exerciseIds) {
+      parentExercises.sort((a, b) => {
+        const aIndex = exerciseIds.indexOf(a.id as string)
+        const bIndex = exerciseIds.indexOf(b.id as string)
+        return aIndex - bIndex
+      })
+    }
+
     const workoutResult: WorkoutResult = (
       await this.table(DBTable.WORKOUT_RESULTS).toArray()
     ).filter((wr) => wr.activated === true)[0] // Should only be one
     const exerciseResults: ExerciseResult[] = (
       await this.table(DBTable.EXERCISE_RESULTS).toArray()
     ).filter((er) => er.activated === true)
+
+    const exerciseResultIds = workoutResult.exerciseResultIds ?? []
+
+    // Sort the exercise results
+    if (exerciseResultIds) {
+      exerciseResults.sort((a, b) => {
+        const aIndex = exerciseResultIds.indexOf(a.id as string)
+        const bIndex = exerciseResultIds.indexOf(b.id as string)
+        return aIndex - bIndex
+      })
+    }
 
     return {
       parentWorkout,

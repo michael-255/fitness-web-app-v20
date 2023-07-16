@@ -11,10 +11,12 @@ defineProps<{
 <template>
   <QCard>
     <QCardSection>
-      <div>{{ parentExercise.name }}</div>
-      <div>{{ parentExercise.desc }}</div>
-      <br />
+      <p class="text-h6">{{ parentExercise.name }}</p>
+
+      <p>{{ parentExercise.desc }}</p>
+
       <p>{{ parentExercise }}</p>
+
       <p>{{ exerciseResult }}</p>
     </QCardSection>
   </QCard>

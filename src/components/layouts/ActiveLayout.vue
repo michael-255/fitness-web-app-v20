@@ -5,17 +5,14 @@ import { AppHeaderColor } from '@/constants/global'
 import { Icon, RouteName } from '@/types/general'
 import { getDurationFromMilliseconds } from '@/utils/common'
 import { useInterval } from '@vueuse/core'
-import useDialogs from '@/composables/useDialogs'
 import useLogger from '@/composables/useLogger'
 import DB from '@/services/Database'
 
 const { log } = useLogger()
-const { dismissDialog } = useDialogs()
 
 const counter = useInterval(1000)
 const title = ref('')
 const createdTimestamp = ref(Date.now())
-const note = ref('')
 const elapsedTime = ref('')
 
 onMounted(async () => {
@@ -26,10 +23,6 @@ onMounted(async () => {
     if (parentWorkout) {
       if (parentWorkout.name) {
         title.value = parentWorkout.name
-      }
-
-      if (parentWorkout?.previousChild?.note) {
-        note.value = parentWorkout.previousChild.note
       }
     }
 
@@ -44,10 +37,6 @@ onMounted(async () => {
   }
 })
 
-function viewPreviousWorkoutNote() {
-  dismissDialog('Previous Workout Note', note.value, Icon.NOTE)
-}
-
 watch(counter, () => {
   elapsedTime.value = getDurationFromMilliseconds(Date.now() - createdTimestamp.value) || ''
 })
@@ -58,14 +47,6 @@ watch(counter, () => {
     <QHeader elevated :class="`bg-${AppHeaderColor}`">
       <QToolbar>
         <QToolbarTitle class="q-ml-xs">{{ title }}</QToolbarTitle>
-        <QBtn
-          v-if="note"
-          flat
-          round
-          :icon="Icon.NOTE"
-          class="q-mr-xs"
-          @click="viewPreviousWorkoutNote()"
-        />
         <QBtn flat round :icon="Icon.BACK" :to="{ name: RouteName.DASHBOARD }" />
       </QToolbar>
     </QHeader>
