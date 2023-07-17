@@ -65,7 +65,10 @@ export class Exercise extends Parent {
   }
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
-    return []
+    return [
+      defineAsyncComponent(() => import('@/components/charts/ChartReps.vue')),
+      defineAsyncComponent(() => import('@/components/charts/ChartWeight.vue')),
+    ]
   }
 
   static getInspectionItems(): InspectionItem[] {

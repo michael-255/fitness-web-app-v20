@@ -15,7 +15,7 @@ import {
 import { onMounted, ref, type Ref } from 'vue'
 import { Duration } from '@/types/general'
 import type { AnyDBRecord, ParentTable } from '@/types/database'
-import { MeasurementInput, Measurement } from '@/models/Measurement'
+import { Exercise, ExerciseInput } from '@/models/Exercise'
 import ErrorStates from '../ErrorStates.vue'
 import useLogger from '@/composables/useLogger'
 import useUIStore from '@/stores/ui'
@@ -45,7 +45,7 @@ const uiStore = useUIStore()
 
 const isVisible = ref(false)
 const recordCount: Ref<number> = ref(0)
-const chartLabel = MeasurementInput.INCHES
+const chartLabel = ExerciseInput.REPS
 const chartData: Ref<{
   labels: any[]
   datasets: any[]
@@ -62,10 +62,10 @@ useChartTimeWatcher(recalculateChart)
 
 async function recalculateChart() {
   try {
-    const { measurementInput } = (await DB.getRecord(props.parentTable, props.id)) as Measurement
-    if (!measurementInput) return
+    const { exerciseInputs } = (await DB.getRecord(props.parentTable, props.id)) as Exercise
+    if (exerciseInputs?.length === 0) return
 
-    if (measurementInput === MeasurementInput.INCHES) {
+    if (exerciseInputs?.includes(ExerciseInput.REPS)) {
       isVisible.value = true
     }
 
@@ -85,13 +85,17 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.inches)
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.reps)
 
     chartData.value = getChartData(chartLabels, getChartDataset(dataItems, 'primary', 'info'))
   } catch (error) {
-    log.error('Error loading measurement inches chart', error)
+    log.error('Error loading exercise reps chart', error)
   }
 }
+
+// TODO
+// - Figure out how to include the sets in the chart legend?
+// - Make a seperate total count chart
 </script>
 
 <template>

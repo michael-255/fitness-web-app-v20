@@ -69,9 +69,11 @@ function chartTimeRule(time: string) {
           @blur="!!inputRef?.value?.validate()"
         />
 
-        <div v-for="(chart, i) in chartComponents" :key="i" class="q-mb-xl">
+        <div v-for="(chart, i) in chartComponents" :key="i">
           <component :is="chart" :id="id" :parentTable="parentTable" />
         </div>
+
+        <QSpace class="q-mb-xl" />
       </QCardSection>
 
       <ErrorStates v-else error="no-data" />

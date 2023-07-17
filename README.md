@@ -4,7 +4,8 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
-- Work on field `Chart` components
+- Work on BMI `Chart` for body weight measurements
+- Work on exercise set and total `Chart` components
 - Work on `Legacy Record Import` composable
 
 ## Table of Contents
