@@ -40,7 +40,7 @@ ChartJS.register(
 )
 
 const { log } = useLogger()
-const { getChartOptions, getChartData, getChartDataset } = useCharting()
+const { getSingleChartOptions, getSingleChartDataset } = useCharting()
 const uiStore = useUIStore()
 
 const isVisible = ref(false)
@@ -87,7 +87,10 @@ async function recalculateChart() {
 
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.inches)
 
-    chartData.value = getChartData(chartLabels, getChartDataset(dataItems, 'primary', 'info'))
+    chartData.value = {
+      labels: chartLabels,
+      datasets: [getSingleChartDataset(dataItems, 'primary', 'info')],
+    }
   } catch (error) {
     log.error('Error loading measurement inches chart', error)
   }
@@ -103,7 +106,7 @@ async function recalculateChart() {
         <span class="text-caption">{{ recordCount }} records in time frame</span>
       </QBadge>
 
-      <Line :options="getChartOptions()" :data="chartData" style="max-height: 500px" />
+      <Line :options="getSingleChartOptions()" :data="chartData" style="max-height: 500px" />
     </div>
 
     <ErrorStates v-else error="no-data" />

@@ -3,7 +3,7 @@ import { colors } from 'quasar'
 export default function useCharting() {
   const { getPaletteColor } = colors
 
-  function getChartOptions() {
+  function getSingleChartOptions() {
     return {
       reactive: true,
       responsive: true,
@@ -34,19 +34,70 @@ export default function useCharting() {
     }
   }
 
-  function getChartData(chartLabels: string[], chartData: any) {
+  function getMultiChartOptions() {
     return {
-      labels: chartLabels,
-      datasets: [chartData],
+      reactive: true,
+      responsive: true,
+      aspectRatio: 1,
+      radius: 2,
+      plugins: {
+        legend: {
+          display: true,
+        },
+        tooltip: {
+          callbacks: {
+            title: (tooltipItem: any) => tooltipItem?.[0]?.label ?? '',
+          },
+        },
+      },
+      interaction: {
+        intersect: false,
+      },
+      scales: {
+        x: {
+          ticks: {
+            autoSkip: true,
+            maxRotation: 70,
+            minRotation: 70,
+          },
+        },
+      },
     }
   }
 
-  function getChartDataset(items: any[], upTrendColor: string, downTrendColor: string) {
+  function getSingleChartDataset(
+    items: any[],
+    upTrendColor: string,
+    downTrendColor: string,
+    pointColor?: string
+  ) {
     return {
       data: items,
-      label: '', // Legend label
-      backgroundColor: getPaletteColor('white'),
-      borderColor: getPaletteColor('white'),
+      label: '', // No legend label for single chart
+      backgroundColor: pointColor || getPaletteColor('white'),
+      borderColor: pointColor || getPaletteColor('white'),
+      segment: {
+        borderColor: (ctx: any) => {
+          return ctx.p0.parsed.y > ctx.p1.parsed.y
+            ? getPaletteColor(downTrendColor)
+            : undefined || getPaletteColor(upTrendColor)
+        },
+      },
+    }
+  }
+
+  function getMultiChartDataset(
+    items: any[],
+    upTrendColor: string,
+    downTrendColor: string,
+    datasetLabel: string,
+    pointColor?: string
+  ) {
+    return {
+      data: items,
+      label: datasetLabel, // Legend label
+      backgroundColor: pointColor || getPaletteColor('white'),
+      borderColor: pointColor || getPaletteColor('white'),
       segment: {
         borderColor: (ctx: any) => {
           return ctx.p0.parsed.y > ctx.p1.parsed.y
@@ -58,8 +109,9 @@ export default function useCharting() {
   }
 
   return {
-    getChartOptions,
-    getChartData,
-    getChartDataset,
+    getSingleChartOptions,
+    getMultiChartOptions,
+    getSingleChartDataset,
+    getMultiChartDataset,
   }
 }

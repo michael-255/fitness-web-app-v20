@@ -41,7 +41,7 @@ ChartJS.register(
 )
 
 const { log } = useLogger()
-const { getChartOptions, getChartData, getChartDataset } = useCharting()
+const { getSingleChartOptions, getSingleChartDataset } = useCharting()
 const uiStore = useUIStore()
 
 const isVisible = ref(false)
@@ -100,7 +100,10 @@ async function recalculateChart() {
 
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.bodyWeight)
 
-    chartData.value = getChartData(chartLabels, getChartDataset(dataItems, 'primary', 'info'))
+    chartData.value = {
+      labels: chartLabels,
+      datasets: [getSingleChartDataset(dataItems, 'primary', 'info')],
+    }
 
     // Include BMI chart if user height is set
     if (typeof userHeight.value === 'number') {
@@ -108,7 +111,11 @@ async function recalculateChart() {
         const height = userHeight.value as number
         return ((weight / (height * height)) * 703).toFixed(2)
       })
-      bmiChartData.value = getChartData(chartLabels, getChartDataset(bmiItems, 'info', 'primary'))
+
+      bmiChartData.value = {
+        labels: chartLabels,
+        datasets: [getSingleChartDataset(bmiItems, 'info', 'primary')],
+      }
     }
   } catch (error) {
     log.error('Error loading measurement body weight chart', error)
@@ -126,7 +133,7 @@ async function recalculateChart() {
       </QBadge>
 
       <Line
-        :options="getChartOptions()"
+        :options="getSingleChartOptions()"
         :data="chartData"
         style="max-height: 500px"
         class="q-mb-xl"
@@ -141,7 +148,7 @@ async function recalculateChart() {
           <span class="text-caption">{{ recordCount }} records in time frame</span>
         </QBadge>
 
-        <Line :options="getChartOptions()" :data="bmiChartData" style="max-height: 500px" />
+        <Line :options="getSingleChartOptions()" :data="bmiChartData" style="max-height: 500px" />
       </div>
     </div>
 

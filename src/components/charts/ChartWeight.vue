@@ -40,7 +40,7 @@ ChartJS.register(
 )
 
 const { log } = useLogger()
-const { getChartOptions, getChartData, getChartDataset } = useCharting()
+const { getMultiChartOptions, getMultiChartDataset } = useCharting()
 const uiStore = useUIStore()
 
 const isVisible = ref(false)
@@ -87,15 +87,15 @@ async function recalculateChart() {
 
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.weightLbs)
 
-    chartData.value = getChartData(chartLabels, getChartDataset(dataItems, 'primary', 'info'))
+    // TODO - Get sets to display correctly on the chart (test differences and a max of 20)
+    chartData.value = {
+      labels: chartLabels,
+      datasets: [getMultiChartDataset(dataItems, 'primary', 'info', 'Sets', 'red')],
+    }
   } catch (error) {
     log.error('Error loading exercise weight chart', error)
   }
 }
-
-// TODO
-// - Figure out how to include the sets in the chart legend?
-// - Make a seperate total count chart
 </script>
 
 <template>
@@ -107,7 +107,7 @@ async function recalculateChart() {
         <span class="text-caption">{{ recordCount }} records in time frame</span>
       </QBadge>
 
-      <Line :options="getChartOptions()" :data="chartData" style="max-height: 500px" />
+      <Line :options="getMultiChartOptions()" :data="chartData" style="max-height: 500px" />
     </div>
 
     <ErrorStates v-else error="no-data" />
