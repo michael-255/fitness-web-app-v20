@@ -34,37 +34,6 @@ export default function useCharting() {
     }
   }
 
-  function getMultiChartOptions() {
-    return {
-      reactive: true,
-      responsive: true,
-      aspectRatio: 1,
-      radius: 2,
-      plugins: {
-        legend: {
-          display: true,
-        },
-        tooltip: {
-          callbacks: {
-            title: (tooltipItem: any) => tooltipItem?.[0]?.label ?? '',
-          },
-        },
-      },
-      interaction: {
-        intersect: false,
-      },
-      scales: {
-        x: {
-          ticks: {
-            autoSkip: true,
-            maxRotation: 70,
-            minRotation: 70,
-          },
-        },
-      },
-    }
-  }
-
   function getSingleChartDataset(
     items: any[],
     upTrendColor: string,
@@ -86,32 +55,8 @@ export default function useCharting() {
     }
   }
 
-  function getMultiChartDataset(
-    items: any[],
-    upTrendColor: string,
-    downTrendColor: string,
-    datasetLabel: string,
-    pointColor?: string
-  ) {
-    return {
-      data: items,
-      label: datasetLabel, // Legend label
-      backgroundColor: pointColor || getPaletteColor('white'),
-      borderColor: pointColor || getPaletteColor('white'),
-      segment: {
-        borderColor: (ctx: any) => {
-          return ctx.p0.parsed.y > ctx.p1.parsed.y
-            ? getPaletteColor(downTrendColor)
-            : undefined || getPaletteColor(upTrendColor)
-        },
-      },
-    }
-  }
-
   return {
     getSingleChartOptions,
-    getMultiChartOptions,
     getSingleChartDataset,
-    getMultiChartDataset,
   }
 }

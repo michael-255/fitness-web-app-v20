@@ -15,7 +15,7 @@ import {
 import { onMounted, ref, type Ref } from 'vue'
 import { Duration } from '@/types/general'
 import type { AnyDBRecord, ParentTable } from '@/types/database'
-import { MeasurementInput, Measurement } from '@/models/Measurement'
+import { Exercise, ExerciseInput } from '@/models/Exercise'
 import ErrorStates from '../ErrorStates.vue'
 import useLogger from '@/composables/useLogger'
 import useUIStore from '@/stores/ui'
@@ -45,7 +45,7 @@ const uiStore = useUIStore()
 
 const isVisible = ref(false)
 const recordCount: Ref<number> = ref(0)
-const chartLabel = MeasurementInput.INCHES
+const chartLabel = 'Best Watts'
 const chartData: Ref<{
   labels: any[]
   datasets: any[]
@@ -62,10 +62,10 @@ useChartTimeWatcher(recalculateChart)
 
 async function recalculateChart() {
   try {
-    const { measurementInput } = (await DB.getRecord(props.parentTable, props.id)) as Measurement
-    if (!measurementInput) return
+    const { exerciseInputs } = (await DB.getRecord(props.parentTable, props.id)) as Exercise
+    if (exerciseInputs?.length === 0) return
 
-    if (measurementInput !== MeasurementInput.INCHES) return
+    if (!exerciseInputs?.includes(ExerciseInput.WATTS)) return
 
     const childRecords = await DB.getSortedChildren(DB.getChildTable(props.parentTable), props.id)
     if (childRecords.length === 0) return
@@ -83,16 +83,16 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.inches)
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => Math.max(...record.watts))
 
     chartData.value = {
       labels: chartLabels,
-      datasets: [getSingleChartDataset(dataItems, 'primary', 'info')],
+      datasets: [getSingleChartDataset(dataItems, 'info', 'info')],
     }
 
     isVisible.value = true
   } catch (error) {
-    log.error('Error loading measurement inches chart', error)
+    log.error('Error loading exercise best watts chart', error)
   }
 }
 </script>

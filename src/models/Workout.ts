@@ -48,7 +48,7 @@ export class Workout extends Parent {
   }
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
-    return []
+    return [defineAsyncComponent(() => import('@/components/charts/ChartWorkoutDuration.vue'))]
   }
 
   static getInspectionItems(): InspectionItem[] {

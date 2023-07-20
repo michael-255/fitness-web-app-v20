@@ -65,9 +65,7 @@ async function recalculateChart() {
     const { measurementInput } = (await DB.getRecord(props.parentTable, props.id)) as Measurement
     if (!measurementInput) return
 
-    if (measurementInput === MeasurementInput.NUMBER) {
-      isVisible.value = true
-    }
+    if (measurementInput !== MeasurementInput.NUMBER) return
 
     const childRecords = await DB.getSortedChildren(DB.getChildTable(props.parentTable), props.id)
     if (childRecords.length === 0) return
@@ -91,6 +89,8 @@ async function recalculateChart() {
       labels: chartLabels,
       datasets: [getSingleChartDataset(dataItems, 'primary', 'info')],
     }
+
+    isVisible.value = true
   } catch (error) {
     log.error('Error loading measurement number chart', error)
   }

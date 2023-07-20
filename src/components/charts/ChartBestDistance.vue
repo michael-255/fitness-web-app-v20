@@ -40,12 +40,12 @@ ChartJS.register(
 )
 
 const { log } = useLogger()
-const { getMultiChartOptions, getMultiChartDataset } = useCharting()
+const { getSingleChartOptions, getSingleChartDataset } = useCharting()
 const uiStore = useUIStore()
 
 const isVisible = ref(false)
 const recordCount: Ref<number> = ref(0)
-const chartLabel = ExerciseInput.REPS
+const chartLabel = 'Best Distance (miles)'
 const chartData: Ref<{
   labels: any[]
   datasets: any[]
@@ -65,9 +65,7 @@ async function recalculateChart() {
     const { exerciseInputs } = (await DB.getRecord(props.parentTable, props.id)) as Exercise
     if (exerciseInputs?.length === 0) return
 
-    if (exerciseInputs?.includes(ExerciseInput.REPS)) {
-      isVisible.value = true
-    }
+    if (!exerciseInputs?.includes(ExerciseInput.DISTANCE)) return
 
     const childRecords = await DB.getSortedChildren(DB.getChildTable(props.parentTable), props.id)
     if (childRecords.length === 0) return
@@ -85,15 +83,18 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.reps)
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) =>
+      Math.max(...record.distanceMiles)
+    )
 
-    // TODO - Get sets to display correctly on the chart (test differences and a max of 20)
     chartData.value = {
       labels: chartLabels,
-      datasets: [getMultiChartDataset(dataItems, 'primary', 'info', 'Sets', 'blue')],
+      datasets: [getSingleChartDataset(dataItems, 'accent', 'accent')],
     }
+
+    isVisible.value = true
   } catch (error) {
-    log.error('Error loading exercise reps chart', error)
+    log.error('Error loading exercise best distance chart', error)
   }
 }
 </script>
@@ -107,7 +108,7 @@ async function recalculateChart() {
         <span class="text-caption">{{ recordCount }} records in time frame</span>
       </QBadge>
 
-      <Line :options="getMultiChartOptions()" :data="chartData" style="max-height: 500px" />
+      <Line :options="getSingleChartOptions()" :data="chartData" style="max-height: 500px" />
     </div>
 
     <ErrorStates v-else error="no-data" />

@@ -75,12 +75,7 @@ async function recalculateChart() {
     const { measurementInput } = (await DB.getRecord(props.parentTable, props.id)) as Measurement
     if (!measurementInput) return
 
-    if (measurementInput === MeasurementInput.BODY_WEIGHT) {
-      isVisible.value = true
-    } else {
-      isVisible.value = false
-      return
-    }
+    if (measurementInput !== MeasurementInput.BODY_WEIGHT) return
 
     const childRecords = await DB.getSortedChildren(DB.getChildTable(props.parentTable), props.id)
     if (childRecords.length === 0) return
@@ -117,6 +112,8 @@ async function recalculateChart() {
         datasets: [getSingleChartDataset(bmiItems, 'info', 'primary')],
       }
     }
+
+    isVisible.value = true
   } catch (error) {
     log.error('Error loading measurement body weight chart', error)
   }

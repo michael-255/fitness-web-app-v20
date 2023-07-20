@@ -4,12 +4,8 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
-- Finish `Chart` components for `Workouts`
-  - `Duration`
-- Finish `Chart` components for `Exercises`
-  - `Sets`
-  - Test with different number of sets on the same exercise (max of 20)
 - Work on `Legacy Record Import` composable
+- May want to DRY up `Chart` component code
 
 ## Table of Contents
 

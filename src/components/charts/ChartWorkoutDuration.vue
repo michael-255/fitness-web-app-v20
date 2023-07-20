@@ -15,7 +15,6 @@ import {
 import { onMounted, ref, type Ref } from 'vue'
 import { Duration } from '@/types/general'
 import type { AnyDBRecord, ParentTable } from '@/types/database'
-import { Exercise, ExerciseInput } from '@/models/Exercise'
 import ErrorStates from '../ErrorStates.vue'
 import useLogger from '@/composables/useLogger'
 import useUIStore from '@/stores/ui'
@@ -40,12 +39,12 @@ ChartJS.register(
 )
 
 const { log } = useLogger()
-const { getMultiChartOptions, getMultiChartDataset } = useCharting()
+const { getSingleChartOptions, getSingleChartDataset } = useCharting()
 const uiStore = useUIStore()
 
 const isVisible = ref(false)
 const recordCount: Ref<number> = ref(0)
-const chartLabel = ExerciseInput.WEIGHT
+const chartLabel = 'Workout Duration (minutes)'
 const chartData: Ref<{
   labels: any[]
   datasets: any[]
@@ -62,13 +61,6 @@ useChartTimeWatcher(recalculateChart)
 
 async function recalculateChart() {
   try {
-    const { exerciseInputs } = (await DB.getRecord(props.parentTable, props.id)) as Exercise
-    if (exerciseInputs?.length === 0) return
-
-    if (exerciseInputs?.includes(ExerciseInput.WEIGHT)) {
-      isVisible.value = true
-    }
-
     const childRecords = await DB.getSortedChildren(DB.getChildTable(props.parentTable), props.id)
     if (childRecords.length === 0) return
 
@@ -85,15 +77,23 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.weightLbs)
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => {
+      if (record.createdTimestamp !== undefined && record.finishedTimestamp !== undefined) {
+        const duration = (record.finishedTimestamp - record.createdTimestamp) / 60_000 // Display minutes
+        return duration < 0.1 ? 0 : duration
+      } else {
+        return 0
+      }
+    })
 
-    // TODO - Get sets to display correctly on the chart (test differences and a max of 20)
     chartData.value = {
       labels: chartLabels,
-      datasets: [getMultiChartDataset(dataItems, 'primary', 'info', 'Sets', 'red')],
+      datasets: [getSingleChartDataset(dataItems, 'primary', 'primary')],
     }
+
+    isVisible.value = true
   } catch (error) {
-    log.error('Error loading exercise weight chart', error)
+    log.error('Error loading workout duration chart', error)
   }
 }
 </script>
@@ -107,7 +107,7 @@ async function recalculateChart() {
         <span class="text-caption">{{ recordCount }} records in time frame</span>
       </QBadge>
 
-      <Line :options="getMultiChartOptions()" :data="chartData" style="max-height: 500px" />
+      <Line :options="getSingleChartOptions()" :data="chartData" style="max-height: 500px" />
     </div>
 
     <ErrorStates v-else error="no-data" />

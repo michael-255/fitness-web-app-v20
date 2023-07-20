@@ -34,8 +34,6 @@ const activeWorkoutSubscription = DB.liveActiveWorkout().subscribe({
     parentExercises.value = liveData.parentExercises
     workoutResult.value = liveData.workoutResult
     exerciseResults.value = liveData.exerciseResults
-
-    log.info('Live Active Workout', { ...liveData }) // TODO - Temp for building
   },
   error: (error) => log.error('Error fetching live Active Workout', error),
 })
