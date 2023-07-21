@@ -13,6 +13,7 @@ import useDialogs from '@/composables/useDialogs'
 import useDefaults from '@/composables/useDefaults'
 import ResponsivePage from '@/components/ResponsivePage.vue'
 import useRouting from '@/composables/useRouting'
+import useLegacyImport from '@/composables/useLegacyImport'
 import DB from '@/services/Database'
 
 useMeta({ title: `${AppName} - Settings` })
@@ -28,14 +29,21 @@ const {
   onAddStandardMeasurements,
 } = useDefaults()
 const { goToLogsData } = useRouting()
+const { convertLegacyRecords } = useLegacyImport()
 
 const heightSchema = z.number().positive().min(1).max(120).optional()
+
+enum ImportType {
+  STANDARD = 'Standard',
+  LEGACY = 'Legacy',
+}
 
 const settings: Ref<Setting[]> = ref([])
 const heightInputRef: Ref<any> = ref(null)
 const heightInches: Ref<number | undefined> = ref(undefined)
 const logDurationIndex: Ref<number> = ref(0)
 const importFile: Ref<any> = ref(null)
+const importLegacyFile: Ref<any> = ref(null)
 const logDurationKeys = [
   // Duration[Duration.Now], // Uncomment to test log purges
   Duration[Duration['One Week']],
@@ -77,7 +85,7 @@ function onRejectedFile(entries: any) {
   log.warn(`Cannot import"${fileName}`, entries)
 }
 
-async function onImportFile() {
+async function onImportFile(type: ImportType = ImportType.STANDARD) {
   const isActiveWorkout = await DB.isActiveWorkout()
 
   const message = isActiveWorkout
@@ -94,25 +102,31 @@ async function onImportFile() {
 
       log.silentDebug('backupData:', backupData)
 
-      if (backupData.appName !== AppName) {
-        throw new Error(`Cannot import data from the app ${backupData.appName}`)
-      }
+      if (type === ImportType.STANDARD) {
+        if (backupData.appName !== AppName) {
+          throw new Error(`Cannot import data from the app ${backupData.appName}`)
+        }
 
-      // Import settings first in case errors stop type importing below
-      if (backupData[InternalTable.SETTINGS].length > 0) {
-        await Promise.all(
-          backupData[InternalTable.SETTINGS]
-            .filter((setting) => Object.values(SettingKey).includes(setting.key))
-            .map(async (setting) => await DB.setSetting(setting.key, setting.value))
-        )
-      }
+        // Import settings first in case errors stop type importing below
+        if (backupData[InternalTable.SETTINGS].length > 0) {
+          await Promise.all(
+            backupData[InternalTable.SETTINGS]
+              .filter((setting) => Object.values(SettingKey).includes(setting.key))
+              .map(async (setting) => await DB.setSetting(setting.key, setting.value))
+          )
+        }
 
-      // Logs are never imported
-      await Promise.all([
-        Object.values(DBTable).map(
-          async (table) => await DB.importRecords(table, backupData[table])
-        ),
-      ])
+        // Logs are never imported
+        await Promise.all([
+          Object.values(DBTable).map(
+            async (table) => await DB.importRecords(table, backupData[table])
+          ),
+        ])
+      } else {
+        // TODO - Legacy import
+        const convertedRecords = convertLegacyRecords(backupData as any)
+        log.info('convertedRecords:', { records: convertedRecords })
+      }
 
       importFile.value = null // Clear input
       log.info('Successfully imported available data')
@@ -371,6 +385,7 @@ async function updateHeight() {
           Import data into the database from a JSON file. The app expects the data in the file to be
           structured the same as the exported version. Logs are ignored during imports.
         </p>
+
         <QFile
           v-model="importFile"
           dense
@@ -383,7 +398,12 @@ async function updateHeight() {
           @rejected="onRejectedFile"
         >
           <template v-slot:before>
-            <QBtn :disable="!importFile" label="Import" color="primary" @click="onImportFile()" />
+            <QBtn
+              :disable="!importFile"
+              label="Import"
+              color="primary"
+              @click="onImportFile(ImportType.STANDARD)"
+            />
           </template>
           <template v-slot:append>
             <QIcon
@@ -391,6 +411,41 @@ async function updateHeight() {
               :name="Icon.CLOSE"
               class="cursor-pointer"
               @click.stop="importFile = null"
+            />
+          </template>
+        </QFile>
+      </div>
+
+      <div class="q-mb-md">
+        <p>
+          Import data from the legacy v16 version of the app into the database from a JSON file.
+        </p>
+
+        <QFile
+          v-model="importLegacyFile"
+          dense
+          outlined
+          counter
+          bottom-slots
+          label="File Select"
+          :max-file-size="Limit.MAX_FILE_SIZE"
+          accept="application/json"
+          @rejected="onRejectedFile"
+        >
+          <template v-slot:before>
+            <QBtn
+              :disable="!importLegacyFile"
+              label="Legacy Import"
+              color="primary"
+              @click="onImportFile(ImportType.LEGACY)"
+            />
+          </template>
+          <template v-slot:append>
+            <QIcon
+              v-if="importLegacyFile"
+              :name="Icon.CLOSE"
+              class="cursor-pointer"
+              @click.stop="importLegacyFile = null"
             />
           </template>
         </QFile>
