@@ -5,7 +5,12 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 ## TODO
 
 - Work on `Legacy Record Import` composable
-- May want to DRY up `Chart` component code
+- Ko-fi updates
+
+## Stretch Goals
+
+- DRY up `Chart` component code
+- Add more tests
 
 ## Table of Contents
 

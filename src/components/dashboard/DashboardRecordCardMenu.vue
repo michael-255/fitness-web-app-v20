@@ -29,9 +29,9 @@ function onToggleFavorite(id: string, name: string, current: boolean) {
   confirmDialog(action, message, icon, 'info', async () => {
     try {
       await DB.toggleFavorite(props.parentTable, id)
-      log.info(`${name} unfavorited`, { id, name })
+      log.info(`${action}d ${name}`, { id, name })
     } catch (error) {
-      log.error('Unfavorite update failed', error)
+      log.error(`${action} failed`, error)
     }
   })
 }
@@ -103,7 +103,11 @@ function onDiscardWorkout() {
     <QBtn round flat :icon="Icon.MENU_VERTICAL">
       <QMenu auto-close anchor="top right" transition-show="flip-right" transition-hide="flip-left">
         <QList>
-          <QItem clickable @click="onCharts(parentTable, record.id)">
+          <QItem
+            :disable="record.previousChild === undefined"
+            clickable
+            @click="onCharts(parentTable, record.id)"
+          >
             <QItemSection avatar>
               <QIcon color="accent" :name="Icon.CHARTS" />
             </QItemSection>
