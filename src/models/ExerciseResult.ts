@@ -38,8 +38,7 @@ export const exerciseResultSchema = _exerciseResultSchema.refine(
   (obj) => {
     const fieldKeys = Object.keys(obj).filter((f) => exerciseDataFields.includes(f as DBField))
     const noUndefined = fieldKeys.every((val) => val !== undefined)
-    const noMissingData = fieldKeys.length > 0
-    return noUndefined && noMissingData
+    return noUndefined
   },
   {
     message: 'Must have valid entries in exercise result data fields',

@@ -4,7 +4,7 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
-- Work on `Legacy Record Import` composable
+- Work on `Legacy Record` cleaning in another project
 - Ko-fi updates
 
 ## Stretch Goals

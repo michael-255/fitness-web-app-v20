@@ -851,21 +851,30 @@ class Database extends Dexie {
       await this.getActiveWorkout()
 
     // Deactivate parent records
-    parentWorkout.activated = false
-    parentExercises.forEach((pe: Exercise) => (pe.activated = false))
+    if (parentWorkout) {
+      parentWorkout.activated = false
+      await this.putRecord(DBTable.WORKOUTS, parentWorkout)
+    }
 
-    await Promise.all([
-      this.putRecord(DBTable.WORKOUTS, parentWorkout),
-      ...parentExercises.map((pe: Exercise) => this.putRecord(DBTable.EXERCISES, pe)),
-    ])
+    if (parentExercises?.length > 0) {
+      parentExercises.forEach((pe: Exercise) => (pe.activated = false))
+      await Promise.all(
+        parentExercises.map((pe: Exercise) => this.putRecord(DBTable.EXERCISES, pe))
+      )
+    }
 
     // Delete child records
-    await Promise.all([
-      ...exerciseResults.map((er: ExerciseResult) =>
-        this.deleteRecord(DBTable.EXERCISE_RESULTS, er.id as string)
-      ),
-      this.deleteRecord(DBTable.WORKOUT_RESULTS, workoutResult.id as string),
-    ])
+    if (exerciseResults?.length > 0) {
+      await Promise.all(
+        exerciseResults.map((er: ExerciseResult) =>
+          this.deleteRecord(DBTable.EXERCISE_RESULTS, er.id as string)
+        )
+      )
+    }
+
+    if (workoutResult) {
+      await this.deleteRecord(DBTable.WORKOUT_RESULTS, workoutResult.id as string)
+    }
   }
 
   /**
