@@ -97,7 +97,7 @@ async function recalculateChart() {
 
     chartData.value = {
       labels: chartLabels,
-      datasets: [getSingleChartDataset(dataItems, 'primary', 'info')],
+      datasets: [getSingleChartDataset(dataItems, 'primary', 'primary')],
     }
 
     // Include BMI chart if user height is set
@@ -109,7 +109,7 @@ async function recalculateChart() {
 
       bmiChartData.value = {
         labels: chartLabels,
-        datasets: [getSingleChartDataset(bmiItems, 'info', 'primary')],
+        datasets: [getSingleChartDataset(bmiItems, 'warning', 'warning')],
       }
     }
 

@@ -87,7 +87,7 @@ async function recalculateChart() {
 
     chartData.value = {
       labels: chartLabels,
-      datasets: [getSingleChartDataset(dataItems, 'primary', 'info')],
+      datasets: [getSingleChartDataset(dataItems, 'primary', 'primary')],
     }
 
     isVisible.value = true

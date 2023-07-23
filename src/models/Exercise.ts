@@ -66,9 +66,9 @@ export class Exercise extends Parent {
 
   static getChartComponents(): ReturnType<typeof defineAsyncComponent>[] {
     return [
-      defineAsyncComponent(() => import('@/components/charts/ChartBestReps.vue')),
       defineAsyncComponent(() => import('@/components/charts/ChartBestWeight.vue')),
       defineAsyncComponent(() => import('@/components/charts/ChartTotalWeight.vue')),
+      defineAsyncComponent(() => import('@/components/charts/ChartBestReps.vue')),
       defineAsyncComponent(() => import('@/components/charts/ChartBestDistance.vue')),
       defineAsyncComponent(() => import('@/components/charts/ChartBestDuration.vue')),
       defineAsyncComponent(() => import('@/components/charts/ChartBestWatts.vue')),
