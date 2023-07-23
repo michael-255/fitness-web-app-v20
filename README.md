@@ -4,6 +4,7 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
+- Fix user height not importing (input not updating?)
 - Need to fix previous sets in active workouts
 - Ko-fi updates
 
