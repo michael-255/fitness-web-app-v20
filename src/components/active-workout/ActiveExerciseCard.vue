@@ -29,8 +29,6 @@ onMounted(async () => {
     props.parentExercise.id as string
   )
 
-  console.log('previousExerciseResults', previousExerciseResults.value)
-
   const exerciseInputs: ExerciseInput[] = props.parentExercise.exerciseInputs || []
 
   exerciseInputs.forEach((input) => {
@@ -106,7 +104,7 @@ function getHint(field: DBField, setIndex: number) {
 
 function getWeightHint(setIndex: number) {
   const previousResults = previousExerciseResults.value
-  const lookbackLimit = previousResults.length > 6 ? 6 : previousResults.length
+  const lookbackLimit = previousResults.length > 5 ? 5 : previousResults.length
 
   let firstStr = 'No previous value'
   let incrementStr = ''
@@ -119,7 +117,7 @@ function getWeightHint(setIndex: number) {
       if (i === 0) {
         firstStr = `${currentWeight}`
       } else {
-        incrementStr += `${previousResults[i - 1]?.weightLbs?.[setIndex] - currentWeight}`
+        incrementStr += `${previousResults[i - 1]?.weightLbs?.[setIndex] || 0 - currentWeight || 0}`
 
         if (i < lookbackLimit - 1) {
           incrementStr += ', '
