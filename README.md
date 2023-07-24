@@ -4,6 +4,7 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
+- Add new workouts?
 - Ko-fi updates
 
 ## Stretch Goals
