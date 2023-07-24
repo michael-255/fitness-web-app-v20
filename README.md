@@ -5,7 +5,6 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 ## TODO
 
 - Add new workouts?
-- Add `useCharting` to web app template
 - Ko-fi updates
 
 ## Stretch Goals
