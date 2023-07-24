@@ -430,10 +430,12 @@ class Database extends Dexie {
     childTable: ChildTable,
     parentId: string
   ): Promise<T[]> {
-    return await this.table(childTable)
-      .where(DBField.PARENT_ID)
-      .equals(parentId)
-      .sortBy(DBField.CREATED_TIMESTAMP)
+    return (
+      await this.table(childTable)
+        .where(DBField.PARENT_ID)
+        .equals(parentId)
+        .sortBy(DBField.CREATED_TIMESTAMP)
+    ).filter((w) => w.activated !== true)
   }
 
   private async _getLastParentChild<T extends AnyDBRecord>(

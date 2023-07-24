@@ -104,22 +104,22 @@ function getHint(field: DBField, setIndex: number) {
 
 function getWeightHint(setIndex: number) {
   const previousResults = previousExerciseResults.value
-  const lookbackLimit = previousResults.length > 5 ? 5 : previousResults.length
 
   let firstStr = 'No previous value'
   let incrementStr = ''
 
-  // Produces the weight increments for the last 5 sets
-  for (let i = 0; i < lookbackLimit; i++) {
-    const currentWeight = previousResults[i]?.weightLbs?.[setIndex]
+  // Produces the weight increments for the last few times the exercise was performed
+  for (let i = 0; i < 6; i++) {
+    const currentWeight = previousResults[i]?.weightLbs?.[setIndex] ?? 0
 
-    if (currentWeight) {
+    if (currentWeight !== undefined) {
       if (i === 0) {
         firstStr = `${currentWeight}`
       } else {
-        incrementStr += `${previousResults[i - 1]?.weightLbs?.[setIndex] || 0 - currentWeight || 0}`
+        const previousWeight = previousResults[i - 1]?.weightLbs?.[setIndex] ?? 0
+        incrementStr += `${previousWeight - currentWeight}`
 
-        if (i < lookbackLimit - 1) {
+        if (i < 6 - 1) {
           incrementStr += ', '
         }
       }

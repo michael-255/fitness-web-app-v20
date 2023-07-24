@@ -54,6 +54,9 @@ const subscription = DB.liveSettings().subscribe({
       ?.value as number
 
     logDurationIndex.value = logDurationKeys.findIndex((i) => i === Duration[logDuration])
+
+    heightInches.value = liveSettings.find((s) => s.key === SettingKey.USER_HEIGHT_INCHES)
+      ?.value as number
   },
   error: (error) => {
     log.error('Error fetching live Settings', error)
