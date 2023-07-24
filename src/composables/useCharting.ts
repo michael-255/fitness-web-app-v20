@@ -44,7 +44,7 @@ export default function useCharting() {
       data: items,
       label: '', // No legend label for single chart
       backgroundColor: pointColor || getPaletteColor('white'),
-      borderColor: pointColor || getPaletteColor('white'),
+      borderColor: pointColor || getPaletteColor('black'),
       segment: {
         borderColor: (ctx: any) => {
           return ctx.p0.parsed.y > ctx.p1.parsed.y
