@@ -280,6 +280,7 @@ async function updateHeight() {
         :rules="[(val: number) => heightSchema.safeParse(val).success || 'Must be 1-120 or empty']"
         hint="Auto Saved"
         type="number"
+        step="0.05"
         placeholder="Total Inches"
         dense
         outlined

@@ -197,6 +197,7 @@ function viewPreviousExerciseNote(note: string) {
                 stack-label
                 class="col-6 q-mb-xs"
                 type="number"
+                step="0.05"
                 filled
                 square
                 dense

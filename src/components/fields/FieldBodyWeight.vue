@@ -51,6 +51,7 @@ function getHint() {
       v-model.number="actionStore.record.bodyWeight"
       :rules="[(val: number) => bodyWeightSchema.safeParse(val).success || 'Must be between 1 and 1000']"
       type="number"
+      step="0.05"
       lazy-rules
       dense
       outlined

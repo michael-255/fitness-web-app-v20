@@ -47,6 +47,7 @@ function getHint() {
       v-model.number="actionStore.record.percent"
       :rules="[(val: number) => percentSchema.safeParse(val).success || 'Must be between 1 and 100']"
       type="number"
+      step="0.05"
       lazy-rules
       dense
       outlined
