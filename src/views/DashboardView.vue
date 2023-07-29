@@ -24,9 +24,8 @@ const { log } = useLogger()
 const { confirmDialog } = useDialogs()
 const {
   onAddBarbellStrengthWorkouts,
+  onAddAuxiliaryStrengthWorkouts,
   onAddStretchRoutine,
-  onAddCarpalTunnelRoutine,
-  onAddDeepBreathingRoutine,
   onAddStandardMeasurements,
 } = useDefaults()
 
@@ -86,6 +85,7 @@ function onDefaultWorkouts() {
     async () => {
       try {
         onAddBarbellStrengthWorkouts()
+        onAddAuxiliaryStrengthWorkouts()
         onAddStretchRoutine()
       } catch (error) {
         log.error('Defaults failed', error)

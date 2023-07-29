@@ -4,9 +4,7 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## TODO
 
-- Finish implementing the `Auxiliary Strength Workouts`
-- `Auxiliary Upper Body` for arms, shoulders, and pull-ups
-- `Auxiliary Lower Body` for legs and core
+- Finish the descriptions for the `Auxiliary Strength Workouts`
 - Ko-fi updates (account?)
 
 ## Stretch Goals

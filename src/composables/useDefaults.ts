@@ -129,38 +129,95 @@ export default function useDefaults() {
         try {
           const now = Date.now()
 
-          // TODO
           const exercises: Exercise[] = [
             {
-              id: 'xxxxx',
+              id: 'c057a2bb-a218-4180-be87-562c00b1af7b',
               createdTimestamp: now,
-              name: 'xxxxx',
-              desc: 'xxxxx',
+              name: 'Bicep Curls',
+              desc: 'DESCRIPTION_PENDING', // TODO
               favorited: false,
               enabled: true,
-              multipleSets: false,
-              exerciseInputs: [],
+              multipleSets: true,
+              exerciseInputs: [ExerciseInput.REPS, ExerciseInput.WEIGHT],
+            },
+            {
+              id: '27f8440c-1a29-4ce4-9561-7aff92f7cf30',
+              createdTimestamp: now,
+              name: 'Front & Side Shoulder Raises',
+              desc: 'DESCRIPTION_PENDING', // TODO
+              favorited: false,
+              enabled: true,
+              multipleSets: true,
+              exerciseInputs: [ExerciseInput.REPS, ExerciseInput.WEIGHT],
+            },
+            {
+              id: 'a1950211-414f-407e-b274-e271fa5fd016',
+              createdTimestamp: now,
+              name: 'Pull-ups',
+              desc: 'DESCRIPTION_PENDING', // TODO
+              favorited: false,
+              enabled: true,
+              multipleSets: true,
+              exerciseInputs: [ExerciseInput.REPS],
+            },
+            {
+              id: 'a04e0220-7a8f-4c6a-9942-0e40bf818313',
+              createdTimestamp: now,
+              name: 'Calf Raises',
+              desc: 'DESCRIPTION_PENDING', // TODO
+              favorited: false,
+              enabled: true,
+              multipleSets: true,
+              exerciseInputs: [ExerciseInput.REPS, ExerciseInput.WEIGHT],
+            },
+            {
+              id: '58145368-8c22-4078-80ae-fbc504100013',
+              createdTimestamp: now,
+              name: 'Leg Raises',
+              desc: 'DESCRIPTION_PENDING', // TODO
+              favorited: false,
+              enabled: true,
+              multipleSets: true,
+              exerciseInputs: [ExerciseInput.REPS],
+            },
+            {
+              id: '3647b297-396a-4eb7-9643-b5dd72b00731',
+              createdTimestamp: now,
+              name: 'Barbell Pelvic Thrusts',
+              desc: 'DESCRIPTION_PENDING', // TODO
+              favorited: false,
+              enabled: true,
+              multipleSets: true,
+              exerciseInputs: [ExerciseInput.REPS, ExerciseInput.WEIGHT],
             },
           ]
 
           const workouts: Workout[] = [
             {
-              id: 'xxxxx',
+              id: 'c148430d-8b2a-46d8-b89e-2f614046b169',
               createdTimestamp: now,
-              name: 'xxxxx',
-              desc: 'xxxxx',
+              name: 'Auxiliary Upper Body',
+              desc: 'Auxiliary workout with additional upper body exercises for the strength program. Do this workout up to 3 times per week.',
               favorited: false,
               enabled: true,
-              exerciseIds: ['xxxxx'],
+              exerciseIds: [
+                'c057a2bb-a218-4180-be87-562c00b1af7b',
+                '27f8440c-1a29-4ce4-9561-7aff92f7cf30',
+                'a1950211-414f-407e-b274-e271fa5fd016',
+              ],
             },
             {
-              id: 'xxxxx',
+              id: '46e363ec-3035-4ca5-8ffc-3fdb7b853596',
               createdTimestamp: now,
-              name: 'xxxxx',
-              desc: 'xxxxx',
+              name: 'Auxiliary Lower Body',
+              desc: 'Auxiliary workout with additional lower body exercises for the strength program. Do this workout up to 3 times per week.',
               favorited: false,
               enabled: true,
-              exerciseIds: ['xxxxx'],
+              exerciseIds: [
+                'a04e0220-7a8f-4c6a-9942-0e40bf818313',
+                '58145368-8c22-4078-80ae-fbc504100013',
+                '3647b297-396a-4eb7-9643-b5dd72b00731',
+              ],
             },
           ]
 
@@ -169,12 +226,12 @@ export default function useDefaults() {
             DB.importRecords(DBTable.WORKOUTS, workouts),
           ])
 
-          log.info('Auxiliary Workouts added', {
+          log.info('Auxiliary Strength Workouts added', {
             exercises: exercises?.length ?? 0,
             workouts: workouts?.length ?? 0,
           })
         } catch (error) {
-          log.error('Error adding Auxiliary Workouts', error)
+          log.error('Error adding Auxiliary Strength Workouts', error)
         }
       }
     )
