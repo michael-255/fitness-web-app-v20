@@ -85,10 +85,8 @@ function onDefaultWorkouts() {
     'info',
     async () => {
       try {
-        await onAddBarbellStrengthWorkouts()
-        await onAddStretchRoutine()
-        await onAddCarpalTunnelRoutine()
-        await onAddDeepBreathingRoutine()
+        onAddBarbellStrengthWorkouts()
+        onAddStretchRoutine()
       } catch (error) {
         log.error('Defaults failed', error)
       }

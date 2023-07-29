@@ -14,7 +14,7 @@ export default function useDefaults() {
   function onAddBarbellStrengthWorkouts() {
     confirmDialog(
       'Add Barbell Strength Workouts',
-      `Would you like to add the Barbell Strength workouts into the database?`,
+      `Would you like to add the Barbell Strength Workouts into the database?`,
       Icon.INFO,
       'info',
       async () => {
@@ -108,12 +108,130 @@ export default function useDefaults() {
             DB.importRecords(DBTable.WORKOUTS, workouts),
           ])
 
-          log.info('Barbell Strength workouts added', {
-            newExercises: exercises?.length ?? 0,
-            newWorkouts: workouts?.length ?? 0,
+          log.info('Barbell Strength Workouts added', {
+            exercises: exercises?.length ?? 0,
+            workouts: workouts?.length ?? 0,
           })
         } catch (error) {
-          log.error('Error adding Barbell Strength workouts', error)
+          log.error('Error adding Barbell Strength Workouts', error)
+        }
+      }
+    )
+  }
+
+  function onAddAuxiliaryStrengthWorkouts() {
+    confirmDialog(
+      'Add Auxiliary Strength Workouts',
+      `Would you like to add the Auxiliary Strength Workouts into the database?`,
+      Icon.INFO,
+      'info',
+      async () => {
+        try {
+          const now = Date.now()
+
+          // TODO
+          const exercises: Exercise[] = [
+            {
+              id: 'xxxxx',
+              createdTimestamp: now,
+              name: 'xxxxx',
+              desc: 'xxxxx',
+              favorited: false,
+              enabled: true,
+              multipleSets: false,
+              exerciseInputs: [],
+            },
+          ]
+
+          const workouts: Workout[] = [
+            {
+              id: 'xxxxx',
+              createdTimestamp: now,
+              name: 'xxxxx',
+              desc: 'xxxxx',
+              favorited: false,
+              enabled: true,
+              exerciseIds: ['xxxxx'],
+            },
+            {
+              id: 'xxxxx',
+              createdTimestamp: now,
+              name: 'xxxxx',
+              desc: 'xxxxx',
+              favorited: false,
+              enabled: true,
+              exerciseIds: ['xxxxx'],
+            },
+          ]
+
+          await Promise.all([
+            DB.importRecords(DBTable.EXERCISES, exercises),
+            DB.importRecords(DBTable.WORKOUTS, workouts),
+          ])
+
+          log.info('Auxiliary Workouts added', {
+            exercises: exercises?.length ?? 0,
+            workouts: workouts?.length ?? 0,
+          })
+        } catch (error) {
+          log.error('Error adding Auxiliary Workouts', error)
+        }
+      }
+    )
+  }
+
+  function onAddAirbikeCardioWorkout() {
+    confirmDialog(
+      'Add Airbike Cardio',
+      `Would you like to add the Airbike Cardio into the database?`,
+      Icon.INFO,
+      'info',
+      async () => {
+        try {
+          const now = Date.now()
+
+          const exercises: Exercise[] = [
+            {
+              id: '94f536a0-df1b-4937-84fd-c6a7b864800e',
+              createdTimestamp: now,
+              name: 'Airbike Cardio Machine',
+              desc: 'Cardio on an airbike machine. Try to get your heart rate elevated to build a sweat.',
+              favorited: false,
+              enabled: true,
+              multipleSets: false,
+              exerciseInputs: [
+                ExerciseInput.SPEED,
+                ExerciseInput.WATTS,
+                ExerciseInput.DISTANCE,
+                ExerciseInput.DURATION,
+                ExerciseInput.CALORIES,
+              ],
+            },
+          ]
+
+          const workouts: Workout[] = [
+            {
+              id: 'fc351639-e700-4c7a-9670-d85f3cd9226d',
+              createdTimestamp: now,
+              name: 'Airbike Cardio',
+              desc: 'Cardio on an airbike machine. Do this workout 3-6 times per week.',
+              favorited: false,
+              enabled: true,
+              exerciseIds: ['94f536a0-df1b-4937-84fd-c6a7b864800e'],
+            },
+          ]
+
+          await Promise.all([
+            DB.importRecords(DBTable.EXERCISES, exercises),
+            DB.importRecords(DBTable.WORKOUTS, workouts),
+          ])
+
+          log.info('Airbike Cardio added', {
+            exercises: exercises?.length ?? 0,
+            workouts: workouts?.length ?? 0,
+          })
+        } catch (error) {
+          log.error('Error adding Airbike Cardio', error)
         }
       }
     )
@@ -250,8 +368,8 @@ export default function useDefaults() {
           ])
 
           log.info('Stretch Routine added', {
-            newExercises: exercises?.length ?? 0,
-            newWorkouts: workouts?.length ?? 0,
+            exercises: exercises?.length ?? 0,
+            workouts: workouts?.length ?? 0,
           })
         } catch (error) {
           log.error('Error adding Stretch Routine', error)
@@ -358,8 +476,8 @@ export default function useDefaults() {
           ])
 
           log.info('Carpal Tunnel Routine added', {
-            newExercises: exercises?.length ?? 0,
-            newWorkouts: workouts?.length ?? 0,
+            exercises: exercises?.length ?? 0,
+            workouts: workouts?.length ?? 0,
           })
         } catch (error) {
           log.error('Error adding Carpal Tunnel Routine', error)
@@ -433,8 +551,8 @@ export default function useDefaults() {
           ])
 
           log.info('Deep Breathing Routine added', {
-            newExercises: exercises?.length ?? 0,
-            newWorkouts: workouts?.length ?? 0,
+            exercises: exercises?.length ?? 0,
+            workouts: workouts?.length ?? 0,
           })
         } catch (error) {
           log.error('Error adding Deep Breathing Routine', error)
@@ -603,6 +721,8 @@ export default function useDefaults() {
 
   return {
     onAddBarbellStrengthWorkouts,
+    onAddAuxiliaryStrengthWorkouts,
+    onAddAirbikeCardioWorkout,
     onAddStretchRoutine,
     onAddCarpalTunnelRoutine,
     onAddDeepBreathingRoutine,
