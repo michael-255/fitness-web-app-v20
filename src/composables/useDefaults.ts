@@ -134,7 +134,7 @@ export default function useDefaults() {
               id: 'c057a2bb-a218-4180-be87-562c00b1af7b',
               createdTimestamp: now,
               name: 'Bicep Curls',
-              desc: 'DESCRIPTION_PENDING', // TODO
+              desc: 'Flex your arm and bring the weight from below your hip to your shoulder.',
               favorited: false,
               enabled: true,
               multipleSets: true,
@@ -144,7 +144,7 @@ export default function useDefaults() {
               id: '27f8440c-1a29-4ce4-9561-7aff92f7cf30',
               createdTimestamp: now,
               name: 'Front & Side Shoulder Raises',
-              desc: 'DESCRIPTION_PENDING', // TODO
+              desc: 'While standing alternate between bringing both arms up in front of you and down, then bring them up at your sides like a T-pose.',
               favorited: false,
               enabled: true,
               multipleSets: true,
@@ -154,7 +154,7 @@ export default function useDefaults() {
               id: 'a1950211-414f-407e-b274-e271fa5fd016',
               createdTimestamp: now,
               name: 'Pull-ups',
-              desc: 'DESCRIPTION_PENDING', // TODO
+              desc: 'With a wide arm position use your back to pull yourelf up until your chin clears the bar.',
               favorited: false,
               enabled: true,
               multipleSets: true,
@@ -164,7 +164,7 @@ export default function useDefaults() {
               id: 'a04e0220-7a8f-4c6a-9942-0e40bf818313',
               createdTimestamp: now,
               name: 'Calf Raises',
-              desc: 'DESCRIPTION_PENDING', // TODO
+              desc: 'Cross one foot behind the other and lift yourself with your remaing calf. Repeat with the other calf.',
               favorited: false,
               enabled: true,
               multipleSets: true,
@@ -174,7 +174,7 @@ export default function useDefaults() {
               id: '58145368-8c22-4078-80ae-fbc504100013',
               createdTimestamp: now,
               name: 'Leg Raises',
-              desc: 'DESCRIPTION_PENDING', // TODO
+              desc: 'Raise your body with your arms and lift your legs up in front of you until they are parallel with the ground.',
               favorited: false,
               enabled: true,
               multipleSets: true,
@@ -184,7 +184,7 @@ export default function useDefaults() {
               id: '3647b297-396a-4eb7-9643-b5dd72b00731',
               createdTimestamp: now,
               name: 'Barbell Pelvic Thrusts',
-              desc: 'DESCRIPTION_PENDING', // TODO
+              desc: 'Place a barbell across your hips and thrust your hips up and down While sitting on the ground with a bench at your back.',
               favorited: false,
               enabled: true,
               multipleSets: true,

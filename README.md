@@ -2,12 +2,7 @@
 
 Fitness Tracker is for tracking workouts, exercises, and measurements as well as charting results.
 
-## TODO
-
-- Finish the descriptions for the `Auxiliary Strength Workouts`
-- Ko-fi updates (account?)
-
-## Stretch Goals
+## Stretch TODOs
 
 - DRY up `Chart` component code
 - Add more tests
