@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
 import { useDialogPluginComponent } from 'quasar'
 import { Duration, Icon } from '@/types/general'
-import type { ParentTable } from '@/types/database'
+import type { AnyDBRecord, ParentTable } from '@/types/database'
 import ErrorStates from '@/components/ErrorStates.vue'
 import useUIStore from '@/stores/ui'
 import DB from '@/services/Database'
@@ -27,7 +27,17 @@ const options: Ref<string[]> = ref([
   Duration[Duration['All Time']],
 ])
 const chartComponents = DB.getChartComponents(props.parentTable)
-const title = DB.getLabel(props.parentTable, 'singular')
+const title = ref('')
+
+onMounted(async () => {
+  const record = (await DB.getRecord(props.parentTable, props.id)) as AnyDBRecord
+
+  if (record && record?.name) {
+    title.value = record.name
+  } else {
+    title.value = DB.getLabel(props.parentTable, 'singular')
+  }
+})
 
 function chartTimeRule(time: string) {
   return time !== undefined && time !== null && time !== ''
