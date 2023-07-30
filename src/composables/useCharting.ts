@@ -55,8 +55,31 @@ export default function useCharting() {
     }
   }
 
+  function getBmiChartDataset(items: any[]) {
+    return {
+      data: items,
+      label: '', // No legend label for single chart
+      backgroundColor: getPaletteColor('white'),
+      borderColor: getPaletteColor('black'),
+      segment: {
+        borderColor: (ctx: any) => {
+          if (ctx.p1.raw >= 30) {
+            return getPaletteColor('negative')
+          } else if (ctx.p1.raw >= 25) {
+            return getPaletteColor('warning')
+          } else if (ctx.p1.raw >= 18.5) {
+            return getPaletteColor('positive')
+          } else {
+            return getPaletteColor('accent')
+          }
+        },
+      },
+    }
+  }
+
   return {
     getSingleChartOptions,
     getSingleChartDataset,
+    getBmiChartDataset,
   }
 }

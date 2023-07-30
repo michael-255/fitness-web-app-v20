@@ -41,7 +41,7 @@ ChartJS.register(
 )
 
 const { log } = useLogger()
-const { getSingleChartOptions, getSingleChartDataset } = useCharting()
+const { getSingleChartOptions, getSingleChartDataset, getBmiChartDataset } = useCharting()
 const uiStore = useUIStore()
 
 const isVisible = ref(false)
@@ -109,7 +109,7 @@ async function recalculateChart() {
 
       bmiChartData.value = {
         labels: chartLabels,
-        datasets: [getSingleChartDataset(bmiItems, 'warning', 'warning')],
+        datasets: [getBmiChartDataset(bmiItems)],
       }
     }
 
