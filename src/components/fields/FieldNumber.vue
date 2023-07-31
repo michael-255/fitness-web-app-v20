@@ -47,7 +47,7 @@ function getHint() {
       v-model.number="actionStore.record.number"
       :rules="[(val: number) => numberSchema.safeParse(val).success || 'Must be a valid number']"
       type="number"
-      step="0.05"
+      step="0.01"
       lazy-rules
       dense
       outlined

@@ -47,7 +47,7 @@ function getHint() {
       v-model.number="actionStore.record.inches"
       :rules="[(val: number) => inchesSchema.safeParse(val).success || 'Must be between 1 and 500']"
       type="number"
-      step="0.05"
+      step="0.01"
       lazy-rules
       dense
       outlined
