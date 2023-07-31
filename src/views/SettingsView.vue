@@ -23,7 +23,7 @@ const { confirmDialog } = useDialogs()
 const {
   onAddBarbellStrengthWorkouts,
   onAddAuxiliaryStrengthWorkouts,
-  onAddAirbikeCardioWorkout,
+  onAddAirbikeCardioExercise,
   onAddStretchRoutine,
   onAddCarpalTunnelRoutine,
   onAddDeepBreathingRoutine,
@@ -352,7 +352,11 @@ async function updateHeight() {
         </div>
 
         <div class="q-mb-md">
-          <QBtn label="Airbike Cardio" color="primary" @click="onAddAirbikeCardioWorkout()" />
+          <QBtn
+            label="Airbike Cardio Exercise"
+            color="primary"
+            @click="onAddAirbikeCardioExercise()"
+          />
         </div>
 
         <div class="q-mb-md">

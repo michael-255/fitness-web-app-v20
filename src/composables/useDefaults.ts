@@ -237,10 +237,10 @@ export default function useDefaults() {
     )
   }
 
-  function onAddAirbikeCardioWorkout() {
+  function onAddAirbikeCardioExercise() {
     confirmDialog(
-      'Add Airbike Cardio',
-      `Would you like to add the Airbike Cardio into the database?`,
+      'Add Airbike Cardio Exercise',
+      `Would you like to add the Airbike Cardio exercise into the database?`,
       Icon.INFO,
       'info',
       async () => {
@@ -266,29 +266,11 @@ export default function useDefaults() {
             },
           ]
 
-          const workouts: Workout[] = [
-            {
-              id: 'fc351639-e700-4c7a-9670-d85f3cd9226d',
-              createdTimestamp: now,
-              name: 'Airbike Cardio',
-              desc: 'Cardio on an airbike machine. Do this workout 3-6 times per week.',
-              favorited: false,
-              enabled: true,
-              exerciseIds: ['94f536a0-df1b-4937-84fd-c6a7b864800e'],
-            },
-          ]
+          await DB.importRecords(DBTable.EXERCISES, exercises)
 
-          await Promise.all([
-            DB.importRecords(DBTable.EXERCISES, exercises),
-            DB.importRecords(DBTable.WORKOUTS, workouts),
-          ])
-
-          log.info('Airbike Cardio added', {
-            exercises: exercises?.length ?? 0,
-            workouts: workouts?.length ?? 0,
-          })
+          log.info('Airbike Cardio exercise added', { exercises: exercises?.length ?? 0 })
         } catch (error) {
-          log.error('Error adding Airbike Cardio', error)
+          log.error('Error adding Airbike Cardio exercise', error)
         }
       }
     )
@@ -779,7 +761,7 @@ export default function useDefaults() {
   return {
     onAddBarbellStrengthWorkouts,
     onAddAuxiliaryStrengthWorkouts,
-    onAddAirbikeCardioWorkout,
+    onAddAirbikeCardioExercise,
     onAddStretchRoutine,
     onAddCarpalTunnelRoutine,
     onAddDeepBreathingRoutine,
