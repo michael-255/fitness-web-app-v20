@@ -1,0 +1,1 @@
+import{F as i,ac as s,D as t}from"./index-6ededb25.js";import{u as d}from"./action-5f1be3cd.js";function f(a){const r=d(),{log:o}=i();s(()=>r.record.parentId,async(c,n)=>{try{if(c!==n&&r.record.parentId&&r.table){const e=await t.getRecord(t.getParentTable(r.table),r.record.parentId);e&&a(e)}}catch(e){o.error("Error with parent id watcher",e)}},{immediate:!0})}export{f as u};
