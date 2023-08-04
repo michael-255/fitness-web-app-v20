@@ -2,7 +2,7 @@
 import { Icon, Limit } from '@/types/general'
 import { AppName } from '@/constants/global'
 import { extend, useMeta } from 'quasar'
-import { onUnmounted, ref, type Ref } from 'vue'
+import { onMounted, onUnmounted, ref, type Ref } from 'vue'
 import type { Workout } from '@/models/Workout'
 import type { Exercise } from '@/models/Exercise'
 import type { WorkoutResult } from '@/models/WorkoutResult'
@@ -22,6 +22,7 @@ const { log } = useLogger()
 const { confirmDialog, dismissDialog } = useDialogs()
 const { goToDashboard } = useRouting()
 
+const isActiveWorkout = ref(false)
 const isFormValid = ref(true)
 const parentWorkout: Ref<Workout> = ref({})
 const parentExercises: Ref<Exercise[]> = ref([])
@@ -36,6 +37,14 @@ const activeWorkoutSubscription = DB.liveActiveWorkout().subscribe({
     exerciseResults.value = liveData.exerciseResults
   },
   error: (error) => log.error('Error fetching live Active Workout', error),
+})
+
+onMounted(async () => {
+  isActiveWorkout.value = await DB.isActiveWorkout()
+
+  if (!isActiveWorkout.value) {
+    goToDashboard()
+  }
 })
 
 onUnmounted(() => {
@@ -76,6 +85,7 @@ async function updateWorkoutNote() {
 <template>
   <ResponsivePage>
     <QForm
+      v-if="isActiveWorkout"
       @submit="onSubmit"
       @validation-error="isFormValid = false"
       @validation-success="isFormValid = true"

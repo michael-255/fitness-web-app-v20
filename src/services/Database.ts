@@ -590,7 +590,7 @@ class Database extends Dexie {
     const { parentWorkout, parentExercises, workoutResult, exerciseResults } =
       await this.getActiveWorkout()
 
-    return (
+    return Boolean(
       parentWorkout || parentExercises.length > 0 || workoutResult || exerciseResults.length > 0
     )
   }
