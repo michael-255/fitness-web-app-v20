@@ -4,7 +4,7 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## Stretch TODOs
 
-- DRY up `Chart` component code
+- `DRY` up `Chart` component code
 - Add more tests
 
 ## Table of Contents
