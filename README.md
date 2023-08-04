@@ -350,6 +350,8 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Credits
 
+https://favicon.io/emoji-favicons/
+
 App favicon was generated using the following graphics from Twemoji:
 
 - Graphics Title: 1f3cb-fe0f-200d-2642-fe0f.svg
