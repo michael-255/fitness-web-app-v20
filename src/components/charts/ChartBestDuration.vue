@@ -84,7 +84,7 @@ async function recalculateChart() {
     )
 
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => {
-      const duration = Math.max(...record.durationMinutes) / 60_000 // Display as minutes
+      const duration = Math.max(...record.durationMinutes)
       return duration < 0.1 ? 0 : duration
     })
 
