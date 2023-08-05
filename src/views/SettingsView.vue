@@ -267,14 +267,12 @@ async function updateHeight() {
 <template>
   <ResponsivePage :bannerIcon="Icon.SETTINGS" bannerTitle="Settings">
     <section class="q-mb-xl">
-      <div class="text-h6 q-mb-md">User Information</div>
+      <div class="text-h6 q-mb-md">Height</div>
 
       <p>
         Your height is used for the BMI calculation when updating your body weight fi you provide
         it. For reference, a height of 5'10" is equal to 70 inches.
       </p>
-
-      <p class="text-h6">Height</p>
 
       <QInput
         v-model.number="heightInches"
