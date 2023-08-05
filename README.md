@@ -4,7 +4,8 @@ Fitness Tracker is for tracking workouts, exercises, and measurements as well as
 
 ## Stretch TODOs
 
-- Use Dexie's hooks `DBCore` for updating previous
+- Use Dexie `transactions` for all DB actions
+- Use Dexie's hooks from `DBCore` for updating previous
 - `DRY` up `Chart` component code
 - Add more tests
 
