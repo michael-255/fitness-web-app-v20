@@ -84,7 +84,7 @@ async function recalculateChart() {
     )
 
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) =>
-      Math.max(...record.speedMph)
+      Number(Math.max(...record.speedMph).toFixed(2))
     )
 
     chartData.value = {

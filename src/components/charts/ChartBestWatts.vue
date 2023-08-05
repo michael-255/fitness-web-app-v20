@@ -83,7 +83,9 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => Math.max(...record.watts))
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) =>
+      Number(Math.max(...record.watts).toFixed(2))
+    )
 
     chartData.value = {
       labels: chartLabels,

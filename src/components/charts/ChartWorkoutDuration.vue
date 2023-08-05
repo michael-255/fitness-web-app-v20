@@ -80,7 +80,7 @@ async function recalculateChart() {
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => {
       if (record.createdTimestamp !== undefined && record.finishedTimestamp !== undefined) {
         const duration = (record.finishedTimestamp - record.createdTimestamp) / 60_000 // Display minutes
-        return duration < 0.1 ? 0 : duration
+        return Number(duration.toFixed(1))
       } else {
         return 0
       }

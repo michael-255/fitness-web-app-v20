@@ -83,7 +83,9 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => Math.max(...record.reps))
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) =>
+      Number(Math.max(...record.reps).toFixed(2))
+    )
 
     chartData.value = {
       labels: chartLabels,

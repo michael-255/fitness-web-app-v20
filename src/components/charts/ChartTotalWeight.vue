@@ -92,7 +92,8 @@ async function recalculateChart() {
       const reps = record.reps
       const weights = record.weightLbs
       const totals = reps.map((rep: number, index: number) => rep * weights[index])
-      return totals.reduce((acc: number, current: number) => acc + current, 0)
+      const total = totals.reduce((acc: number, current: number) => acc + current, 0)
+      return Number(total.toFixed(2))
     })
 
     chartData.value = {

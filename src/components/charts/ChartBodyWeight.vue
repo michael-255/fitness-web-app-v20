@@ -93,7 +93,9 @@ async function recalculateChart() {
       date.formatDate(record.createdTimestamp, 'YYYY MMM D')
     )
 
-    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) => record.bodyWeight)
+    const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) =>
+      Number(record.bodyWeight.toFixed(2))
+    )
 
     chartData.value = {
       labels: chartLabels,

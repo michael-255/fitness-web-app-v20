@@ -84,7 +84,7 @@ async function recalculateChart() {
     )
 
     const dataItems = timeRestrictedRecords.map((record: AnyDBRecord) =>
-      Math.max(...record.weightLbs)
+      Number(Math.max(...record.weightLbs).toFixed(2))
     )
 
     chartData.value = {

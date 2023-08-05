@@ -88,25 +88,25 @@ export class MeasurementResult extends Child {
         field: DBField.BODY_WEIGHT,
         label: MeasurementInput.BODY_WEIGHT,
         output: 'single',
-        format: (val: number | undefined) => (val ? `${val} lbs` : '-'),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))} lbs` : '-'),
       },
       {
         field: DBField.PERCENT,
         label: MeasurementInput.PERCENT,
         output: 'single',
-        format: (val: number | undefined) => (val ? `${val}%` : '-'),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))}%` : '-'),
       },
       {
         field: DBField.INCHES,
         label: MeasurementInput.INCHES,
         output: 'single',
-        format: (val: number | undefined) => (val ? `${val} in` : '-'),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))} in` : '-'),
       },
       {
         field: DBField.NUMBER,
         label: MeasurementInput.NUMBER,
         output: 'single',
-        format: (val: number | undefined) => (val ? `${val}` : '-'),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))}` : '-'),
       },
     ]
   }
@@ -121,7 +121,7 @@ export class MeasurementResult extends Child {
         sortable: true,
         required: false,
         field: (row: any) => row[DBField.BODY_WEIGHT],
-        format: (val: number | undefined) => (val ? `${val} lbs` : ''),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))} lbs` : ''),
       },
       {
         name: DBField.PERCENT,
@@ -130,7 +130,7 @@ export class MeasurementResult extends Child {
         sortable: true,
         required: false,
         field: (row: any) => row[DBField.PERCENT],
-        format: (val: number | undefined) => (val ? `${val}%` : ''),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))}%` : ''),
       },
       {
         name: DBField.INCHES,
@@ -139,7 +139,7 @@ export class MeasurementResult extends Child {
         sortable: true,
         required: false,
         field: (row: any) => row[DBField.INCHES],
-        format: (val: number | undefined) => (val ? `${val} in` : ''),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))} in` : ''),
       },
       {
         name: DBField.NUMBER,
@@ -148,7 +148,7 @@ export class MeasurementResult extends Child {
         sortable: true,
         required: false,
         field: (row: any) => row[DBField.NUMBER],
-        format: (val: number | undefined) => (val ? `${val}` : ''),
+        format: (val: number | undefined) => (val ? `${Number(val.toFixed(2))}` : ''),
       },
     ]
   }
