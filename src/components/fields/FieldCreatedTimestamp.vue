@@ -1,20 +1,33 @@
 <script setup lang="ts">
 import { date } from 'quasar'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
 import { Icon } from '@/types/general'
+import type { DBTable } from '@/types/database'
+import useRouting from '@/composables/useRouting'
 import useActionStore from '@/stores/action'
+import DB from '@/services/Database'
+
+const { routeTable, routeId } = useRouting()
 
 const actionStore = useActionStore()
 
+const existingTime: Ref<number | undefined> = ref(undefined)
 const displayDate = ref('')
 const datePicker = ref('')
 const timePicker = ref('')
 
-onMounted(() => {
-  const existingTime = actionStore.record.createdTimestamp ?? Date.now()
-  datePicker.value = date.formatDate(existingTime, 'ddd MMM DD YYYY')
-  timePicker.value = date.formatDate(existingTime, 'HH:mm:00')
-  updateDisplayDate(existingTime)
+onMounted(async () => {
+  // So edit routes get the correct time
+  if (routeId) {
+    existingTime.value =
+      (await DB.getRecord(routeTable as DBTable, routeId as string))?.createdTimestamp ?? Date.now()
+  } else {
+    existingTime.value = Date.now()
+  }
+
+  datePicker.value = date.formatDate(existingTime.value, 'ddd MMM DD YYYY')
+  timePicker.value = date.formatDate(existingTime.value, 'HH:mm:00')
+  updateDisplayDate(existingTime.value)
 })
 
 function updateDisplayDate(timestamp: number = Date.now()) {
