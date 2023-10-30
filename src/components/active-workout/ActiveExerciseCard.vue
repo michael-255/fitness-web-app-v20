@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { extend } from 'quasar'
-import { onMounted, ref, type Ref } from 'vue'
-import { DBTable, type AnyDBRecord, DBField } from '@/types/database'
+import useDialogs from '@/composables/useDialogs'
+import useLogger from '@/composables/useLogger'
+import { textAreaSchema } from '@/models/_Parent'
 import { ExerciseInput, type Exercise } from '@/models/Exercise'
 import type { ExerciseResult } from '@/models/ExerciseResult'
 import { numberSchema } from '@/models/MeasurementResult'
-import { Icon, Limit } from '@/types/general'
-import { textAreaSchema } from '@/models/_Parent'
-import useDialogs from '@/composables/useDialogs'
-import useLogger from '@/composables/useLogger'
 import DB from '@/services/Database'
+import { DBField, DBTable, type AnyDBRecord } from '@/types/database'
+import { Icon, Limit } from '@/types/general'
+import { extend } from 'quasar'
+import { onMounted, ref, type Ref } from 'vue'
 
 const props = defineProps<{
   parentExercise: Exercise // For displaying exercise info
