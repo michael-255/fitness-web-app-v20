@@ -60,8 +60,8 @@ useMeta({ title: `${AppName} - List Workout` })
                 <span class="text-caption text-positive"> 1 minute ea.</span>
             </li>
             <li>
-                Hamstring
-                <span class="text-caption text-positive"> 1 minute ea.</span>
+                Pancake
+                <span class="text-caption text-positive"> 1 minute</span>
             </li>
             <li>
                 Butterfly
@@ -76,11 +76,11 @@ useMeta({ title: `${AppName} - List Workout` })
                 <span class="text-caption text-positive"> 1 minute ea.</span>
             </li>
             <li>
-                Calf
+                Calves
                 <span class="text-caption text-positive"> 1 minute</span>
             </li>
             <li>
-                Toe Touch
+                Forward Fold
                 <span class="text-caption text-positive"> 1 minute</span>
             </li>
             <li>
@@ -101,18 +101,6 @@ useMeta({ title: `${AppName} - List Workout` })
             </li>
             <li>
                 Fist Clinch, Knuckle, Finger Opens
-                <span class="text-caption text-positive">15 reps</span>
-            </li>
-            <li>
-                Isolated Finger Tip Flexion
-                <span class="text-caption text-positive">15 reps</span>
-            </li>
-            <li>
-                Isolated Knuckle Flexion
-                <span class="text-caption text-positive">15 reps</span>
-            </li>
-            <li>
-                Thumb to Pinky
                 <span class="text-caption text-positive">15 reps</span>
             </li>
             <li>
